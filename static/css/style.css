@@ -1,0 +1,500 @@
+/* static/css/style.css */
+:root {
+    /* Light theme variables */
+    --primary: #4f46e5;
+    --primary-light: #6366f1;
+    --primary-dark: #4338ca;
+    --bg-color: #f9fafb;
+    --card-bg: #ffffff;
+    --text-color: #1f2937;
+    --text-muted: #6b7280;
+    --border-color: #e5e7eb;
+    --input-bg: #ffffff;
+    --input-border: #d1d5db;
+    --drop-area-bg: #f3f4f6;
+    --drop-area-border: #d1d5db;
+    --navbar-bg: #ffffff;
+    --footer-bg: #ffffff;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --feature-bg: #ffffff;
+    --feature-icon-bg: rgba(99, 102, 241, 0.1);
+    --success-color: #10b981;
+    --success-bg: rgba(16, 185, 129, 0.1);
+    --warning-color: #f59e0b;
+    --warning-bg: rgba(245, 158, 11, 0.1);
+}
+
+[data-theme="dark"] {
+    /* Dark theme variables */
+    --primary: #6366f1;
+    --primary-light: #818cf8;
+    --primary-dark: #4f46e5;
+    --bg-color: #111827;
+    --card-bg: #1f2937;
+    --text-color: #f3f4f6;
+    --text-muted: #9ca3af;
+    --border-color: #374151;
+    --input-bg: #374151;
+    --input-border: #4b5563;
+    --drop-area-bg: #1f2937;
+    --drop-area-border: #4b5563;
+    --navbar-bg: #1f2937;
+    --footer-bg: #1f2937;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --feature-bg: #1f2937;
+    --feature-icon-bg: rgba(99, 102, 241, 0.2);
+    --success-color: #10b981;
+    --success-bg: rgba(16, 185, 129, 0.2);
+    --warning-color: #f59e0b;
+    --warning-bg: rgba(245, 158, 11, 0.2);
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 60px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Theme toggle button */
+.theme-toggle-btn {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.25rem;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.theme-toggle-btn:hover {
+    background-color: rgba(99, 102, 241, 0.1);
+}
+
+.dark-icon, .light-icon {
+    position: absolute;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.dark-icon {
+    opacity: 1;
+    transform: rotate(0);
+}
+
+.light-icon {
+    opacity: 0;
+    transform: rotate(90deg);
+}
+
+.dark-mode-active .dark-icon {
+    opacity: 0;
+    transform: rotate(-90deg);
+}
+
+.dark-mode-active .light-icon {
+    opacity: 1;
+    transform: rotate(0);
+}
+
+/* Navbar styling */
+.navbar {
+    background-color: var(--navbar-bg);
+    box-shadow: 0 1px 3px var(--shadow-color);
+    padding: 1rem 0;
+    transition: background-color 0.3s ease;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    color: var(--primary);
+    font-size: 1.25rem;
+}
+
+.navbar-brand svg {
+    margin-right: 0.5rem;
+}
+
+.navbar-brand span {
+    margin-left: 8px;
+}
+
+/* Main container */
+.main-container {
+    padding: 3rem 1rem;
+    flex-grow: 1;
+}
+
+/* App header */
+.app-header {
+    margin-bottom: 2.5rem;
+}
+
+.app-header h1 {
+    color: var(--text-color);
+    font-weight: 700;
+    font-size: 2.25rem;
+    margin-bottom: 0.75rem;
+}
+
+.app-header .lead {
+    color: var(--text-muted);
+    font-size: 1.125rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* App card */
+.app-card {
+    background-color: var(--card-bg);
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color);
+    padding: 2rem;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Nav pills */
+.nav-pills {
+    margin-bottom: 2rem;
+    gap: 0.5rem;
+}
+
+.nav-pills .nav-link {
+    color: var(--text-muted);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.nav-pills .nav-link:hover {
+    background-color: rgba(99, 102, 241, 0.1);
+}
+
+.nav-pills .nav-link.active {
+    background-color: var(--primary);
+    color: #ffffff;
+}
+
+/* File upload area */
+.file-upload-container {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.file-input {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+}
+
+.file-drop-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    border: 2px dashed var(--drop-area-border);
+    border-radius: 0.75rem;
+    background-color: var(--drop-area-bg);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.file-drop-area:hover, 
+.file-drop-area.highlight {
+    border-color: var(--primary-light);
+    background-color: rgba(99, 102, 241, 0.1);
+}
+
+.file-drop-area.has-file {
+    border-color: var(--success-color);
+    background-color: var(--success-bg);
+}
+
+.file-icon {
+    font-size: 2.5rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    transition: color 0.3s ease;
+}
+
+.file-drop-area:hover .file-icon,
+.file-drop-area.highlight .file-icon {
+    color: var(--primary);
+}
+
+.file-drop-area.has-file .file-icon {
+    color: var(--success-color);
+}
+
+.file-message {
+    text-align: center;
+}
+
+.file-message .main-text {
+    display: block;
+    font-weight: 500;
+    color: var(--text-color);
+    margin-bottom: 0.25rem;
+    transition: color 0.3s ease;
+}
+
+.file-message .sub-text {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    transition: color 0.3s ease;
+}
+
+.file-info {
+    margin-top: 1rem;
+}
+
+.selected-file {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    background-color: var(--drop-area-bg);
+    border-radius: 0.5rem;
+    transition: background-color 0.3s ease;
+}
+
+.file-name {
+    font-weight: 500;
+    margin-right: 0.5rem;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+}
+
+.file-size {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    transition: color 0.3s ease;
+}
+
+/* Form elements */
+.form-control {
+    padding: 0.75rem;
+    border: 1px solid var(--input-border);
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+}
+
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+}
+
+textarea.form-control {
+    min-height: 160px;
+}
+
+/* Buttons */
+.btn {
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.btn-lg {
+    padding: 1rem 2rem;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(67, 56, 202, 0.5);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+.btn-outline-secondary {
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+.btn-outline-secondary:hover {
+    background-color: rgba(99, 102, 241, 0.1);
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+/* Features section */
+.app-features {
+    margin-top: 3rem;
+}
+
+.feature {
+    text-align: center;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    background-color: var(--feature-bg);
+    box-shadow: 0 1px 3px var(--shadow-color);
+    height: 100%;
+    transition: all 0.3s ease;
+}
+
+.feature:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -2px var(--shadow-color);
+}
+
+.feature-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    background-color: var(--feature-icon-bg);
+    color: var(--primary);
+    font-size: 1.5rem;
+    margin-bottom: 1.25rem;
+    transition: background-color 0.3s ease;
+}
+
+.feature h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+}
+
+.feature p {
+    color: var(--text-muted);
+    margin-bottom: 0;
+    transition: color 0.3s ease;
+}
+
+/* Footer */
+.footer {
+    background-color: var(--footer-bg);
+    border-top: 1px solid var(--border-color);
+    color: var(--text-muted);
+    padding: 1.5rem 0;
+    margin-top: auto;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Result page styles */
+.result-card {
+    text-align: center;
+}
+
+.success-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    background-color: var(--success-bg);
+    color: var(--success-color);
+    font-size: 2.5rem;
+    margin: 0 auto 1.5rem;
+    transition: background-color 0.3s ease;
+}
+
+.result-section {
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.result-label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+}
+
+.alert {
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.alert-warning {
+    background-color: var(--warning-bg);
+    border-left: 4px solid var(--warning-color);
+    color: var(--text-color);
+}
+
+.alert-icon {
+    color: var(--warning-color);
+    font-size: 1.25rem;
+    margin-right: 1rem;
+}
+
+.copy-message {
+    position: absolute;
+    right: 0;
+    bottom: -1.5rem;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    opacity: 0;
+    transition: opacity 0.2s ease, background-color 0.3s ease, color 0.3s ease;
+    border: 1px solid var(--border-color);
+}
+
+@media (max-width: 768px) {
+    .app-header h1 {
+        font-size: 1.75rem;
+    }
+    
+    .app-card {
+        padding: 1.5rem;
+    }
+    
+    .file-drop-area {
+        padding: 2rem 1rem;
+    }
+}
+
+/* Additional dark mode specific styles */
+[data-theme="dark"] .form-control::placeholder {
+    color: #9ca3af;
+}
+
+[data-theme="dark"] .copy-message {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Enhance focus states for dark mode accessibility */
+[data-theme="dark"] .form-control:focus {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.4);
+}
+
+[data-theme="dark"] .btn:focus {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.4);
+}
