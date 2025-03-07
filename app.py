@@ -21,33 +21,56 @@ key_store = {}
 def generate_key():
     return Fernet.generate_key()
 
-# Encrypt file
-def encrypt_file(file_data, key=None):
+def encrypt_file(file_data, key=None, use_key=True):
     if key is None:
         key = generate_key()
     
     fernet = Fernet(key)
     encrypted_data = fernet.encrypt(file_data)
+    
+    if not use_key:
+        combined_data = key + b"||KEY_SEPARATOR||" + encrypted_data
+        return combined_data, key
     return encrypted_data, key
 
+
 # Decrypt file
-def decrypt_file(encrypted_data, key):
+def decrypt_file(encrypted_data, key=None):
+    if key is None or b"||KEY_SEPARATOR||" in encrypted_data:
+        parts = encrypted_data.split(b"||KEY_SEPARATOR||", 1)
+        if len(parts) == 2:
+            key = parts[0]
+            encrypted_data = parts[1]
+    
     fernet = Fernet(key)
     decrypted_data = fernet.decrypt(encrypted_data)
     return decrypted_data
 
 # Encrypt text
-def encrypt_text(text, key=None):
+def encrypt_text(text, key=None, use_key=True):
     if key is None:
         key = generate_key()
         
     fernet = Fernet(key)
     encoded_text = text.encode('utf-8')
     encrypted_text = fernet.encrypt(encoded_text)
+    
+    # For direct method, combine key and encrypted text
+    if not use_key:
+        # Store key and encrypted data together with a separator
+        return key + b"||KEY_SEPARATOR||" + encrypted_text, key
     return encrypted_text, key
 
 # Decrypt text
-def decrypt_text(encrypted_text, key):
+def decrypt_text(encrypted_text, key=None):
+    # Check if this is direct-encrypted text (contains embedded key)
+    if key is None or b"||KEY_SEPARATOR||" in encrypted_text:
+        # Extract the key and actual encrypted text
+        parts = encrypted_text.split(b"||KEY_SEPARATOR||", 1)
+        if len(parts) == 2:
+            key = parts[0]
+            encrypted_text = parts[1]
+    
     fernet = Fernet(key)
     decrypted_data = fernet.decrypt(encrypted_text)
     return decrypted_data.decode('utf-8')
@@ -75,10 +98,9 @@ def encrypt_file_route():
     try:
         if use_key:
             key = request.form.get('key', '').strip().encode('utf-8') or generate_key()
+            encrypted_data, _ = encrypt_file(file_data, key, use_key=True)
         else:
-            key = generate_key()
-
-        encrypted_data, _ = encrypt_file(file_data, key)
+            encrypted_data, key = encrypt_file(file_data, use_key=False)
         
         memory_file = io.BytesIO(encrypted_data)
         memory_file.seek(0)
@@ -89,10 +111,10 @@ def encrypt_file_route():
             download_name=f"encrypted_{filename}",
             mimetype='application/octet-stream'
         ), {'key': key.decode('utf-8')}
-    
+
     except Exception as e:
         return render_template('error.html', error=str(e))
-
+    
 @app.route('/decrypt_file', methods=['POST'])
 def decrypt_file_route():
     use_key = request.form.get('use_key') == 'true'
@@ -114,10 +136,10 @@ def decrypt_file_route():
             key = request.form.get('key', '').strip().encode('utf-8')
             if not key:
                 return render_template('error.html', error="Decryption key is required.")
+            decrypted_data = decrypt_file(file_data, key)
         else:
-            return render_template('error.html', error="Decryption key is required.")
-
-        decrypted_data = decrypt_file(file_data, key)
+            # Use embedded key for direct decryption
+            decrypted_data = decrypt_file(file_data)
 
         memory_file = io.BytesIO(decrypted_data)
         memory_file.seek(0)
@@ -181,4 +203,4 @@ def decrypt_text_route():
         return render_template('error.html', error=f"Decryption failed: {str(e)}")
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5001)  # Change 5001 to your desired port

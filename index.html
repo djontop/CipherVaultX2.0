@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CipherVaultX | Secure Encryption</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-shield-lock" viewBox="0 0 16 16">
+                    <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.775 11.775 0 0 1-2.517 2.453 7.159 7.159 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7.158 7.158 0 0 1-1.048-.625 11.777 11.777 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 62.456 62.456 0 0 1 5.072.56z"/>
+                    <path d="M9.5 6.5a1.5 1.5 0 0 1-1 1.415v2.585a.5.5 0 0 1-1 0V7.915a1.5 1.5 0 1 1 2-1.415z"/>
+                </svg>
+                <span>CipherVaultX</span>
+            </a>
+            <div class="ms-auto">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Dark Mode">
+                    <i class="fas fa-moon dark-icon"></i>
+                    <i class="fas fa-sun light-icon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+        <div class="container main-container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="app-header text-center mb-5">
+                        <h1>Secure File & Text Encryption</h1>
+                    </div>
+                    
+                    <div class="app-card">
+                        <ul class="nav nav-pills nav-justified mb-4" id="mainTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="encrypt-tab" data-bs-toggle="pill" data-bs-target="#encrypt-content" type="button" role="tab">
+                                    <i class="fas fa-lock me-2"></i>Encrypt
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="decrypt-tab" data-bs-toggle="pill" data-bs-target="#decrypt-content" type="button" role="tab">
+                                    <i class="fas fa-unlock me-2"></i>Decrypt
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="steganography-tab" data-bs-toggle="pill" data-bs-target="#stegano-content" type="button" role="tab">
+                                    <i class="fas fa-image me-2"></i> Steganography
+                                </button>
+                            </li>
+                        </ul>
+                        
+                        
+                        <div class="tab-content" id="mainTabsContent">
+                            <!-- ENCRYPTION TAB -->
+                            <div class="tab-pane fade show active" id="encrypt-content" role="tabpanel">
+                                <ul class="nav nav-pills nav-justified mb-4" id="encryptTabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="direct-file-encrypt-tab" data-bs-toggle="pill" 
+                                                data-bs-target="#direct-file-encrypt" type="button" role="tab">
+                                            <i class="fas fa-file-alt me-2"></i>Direct File
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="direct-text-encrypt-tab" data-bs-toggle="pill" 
+                                                data-bs-target="#direct-text-encrypt" type="button" role="tab">
+                                            <i class="fas fa-font me-2"></i>Direct Text
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="key-file-encrypt-tab" data-bs-toggle="pill" 
+                                                data-bs-target="#key-file-encrypt" type="button" role="tab">
+                                            <i class="fas fa-file-alt me-2"></i>File + Key
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="key-text-encrypt-tab" data-bs-toggle="pill" 
+                                                data-bs-target="#key-text-encrypt" type="button" role="tab">
+                                            <i class="fas fa-font me-2"></i>Text + Key
+                                        </button>
+                                    </li>
+                                </ul>
+                                
+                                <div class="tab-content" id="encryptTabsContent">
+                                    <!-- Direct File Encryption -->
+                                    <div class="tab-pane fade show active" id="direct-file-encrypt" role="tabpanel">
+                                        <form action="/encrypt_file" method="post" enctype="multipart/form-data">
+                                            <input type="hidden" name="use_key" value="false">
+                                            <div class="file-upload-container mb-4">
+                                                <input type="file" name="file" id="direct-file-upload" class="file-input" required>
+                                                <label for="direct-file-upload" class="file-drop-area">
+                                                    <div class="file-icon">
+                                                        <i class="fas fa-cloud-upload-alt"></i>
+                                                    </div>
+                                                    <div class="file-message">
+                                                        <span class="main-text">Drag & drop file here</span>
+                                                        <span class="sub-text">or click to browse files</span>
+                                                    </div>
+                                                </label>
+                                                <div id="direct-file-info" class="file-info"></div>
+                                            </div>
+                                            <div class="d-grid">
+                                                <button type="submit" class="btn btn-primary btn-lg">
+                                                    <i class="fas fa-lock me-2"></i>Encrypt File
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    
+                                    <!-- Direct Text Encryption -->
+                                    <div class="tab-pane fade" id="direct-text-encrypt" role="tabpanel">
+                                        <form action="/encrypt_text" method="post">
+                                            <input type="hidden" name="use_key" value="false">
+                                            <div class="form-group mb-4">
+                                                <textarea name="text" class="form-control" rows="6" placeholder="Enter text to encrypt..." required></textarea>
+                                            </div>
+                                            <div class="d-grid">
+                                                <button type="submit" class="btn btn-primary btn-lg">
+                                                    <i class="fas fa-lock me-2"></i>Encrypt Text
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    
+                                    <!-- File Encryption with Key -->
+                                    <div class="tab-pane fade" id="key-file-encrypt" role="tabpanel">
+                                        <form action="/encrypt_file" method="post" enctype="multipart/form-data">
+                                            <input type="hidden" name="use_key" value="true">
+                                            <div class="form-group mb-4">
+                                                <label for="file-encrypt-key" class="form-label">Encryption Key (Optional)</label>
+                                                <div class="input-group mb-3">
+                                                    <input type="text" name="key" id="file-encrypt-key" class="form-control" placeholder="Enter your key or leave empty to generate a new one">
+                                                    <button type="button" class="btn btn-outline-secondary" id="generate-file-key">
+                                                        <i class="fas fa-key me-2"></i>Generate
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="file-upload-container mb-4">
+                                                <input type="file" name="file" id="key-file-upload" class="file-input" required>
+                                                <label for="key-file-upload" class="file-drop-area">
+                                                    <div class="file-icon">
+                                                        <i class="fas fa-cloud-upload-alt"></i>
+                                                    </div>
+                                                    <div class="file-message">
+                                                        <span class="main-text">Drag & drop file here</span>
+                                                        <span class="sub-text">or click to browse files</span>
+                                                    </div>
+                                                </label>
+                                                <div id="key-file-info" class="file-info"></div>
+                                            </div>
+                                            <div class="d-grid">
+                                                <button type="submit" class="btn btn-primary btn-lg">
+                                                    <i class="fas fa-lock me-2"></i>Encrypt File with Key
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    
+                                    <!-- Text Encryption with Key -->
+                                    <div class="tab-pane fade" id="key-text-encrypt" role="tabpanel">
+                                        <form action="/encrypt_text" method="post">
+                                            <input type="hidden" name="use_key" value="true">
+                                            <div class="form-group mb-4">
+                                                <label for="text-encrypt-key" class="form-label">Encryption Key (Optional)</label>
+                                                <div class="input-group mb-3">
+                                                    <input type="text" name="key" id="text-encrypt-key" class="form-control" placeholder="Enter your key or leave empty to generate a new one">
+                                                    <button type="button" class="btn btn-outline-secondary" id="generate-text-key">
+                                                        <i class="fas fa-key me-2"></i>Generate
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="form-group mb-4">
+                                                <textarea name="text" class="form-control" rows="6" placeholder="Enter text to encrypt..." required></textarea>
+                                            </div>
+                                            <div class="d-grid">
+                                                <button type="submit" class="btn btn-primary btn-lg">
+                                                    <i class="fas fa-lock me-2"></i>Encrypt Text with Key
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- DECRYPTION TAB -->
+                            <div class="tab-pane fade" id="decrypt-content" role="tabpanel">
+                                <ul class="nav nav-pills nav-justified mb-4" id="decryptTabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="direct-file-decrypt-tab" data-bs-toggle="pill" 
+                                                data-bs-target="#direct-file-decrypt" type="button" role="tab">
+                                            <i class="fas fa-file-alt me-2"></i>Direct File
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="direct-text-decrypt-tab" data-bs-toggle="pill" 
+                                                data-bs-target="#direct-text-decrypt" type="button" role="tab">
+                                            <i class="fas fa-font me-2"></i>Direct Text
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="key-file-decrypt-tab" data-bs-toggle="pill" 
+                                                data-bs-target="#key-file-decrypt" type="button" role="tab">
+                                            <i class="fas fa-file-alt me-2"></i>File + Key
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="key-text-decrypt-tab" data-bs-toggle="pill" 
+                                                data-bs-target="#key-text-decrypt" type="button" role="tab">
+                                            <i class="fas fa-font me-2"></i>Text + Key
+                                        </button>
+                                    </li>
+                                </ul>
+                                
+                                <div class="tab-content" id="decryptTabsContent">
+                                    <!-- Direct File Decryption -->
+                                    <div class="tab-pane fade show active" id="direct-file-decrypt" role="tabpanel">
+                                        <form action="/decrypt_file" method="post" enctype="multipart/form-data">
+                                            <input type="hidden" name="use_key" value="false">
+                                            <div class="file-upload-container mb-4">
+                                                <input type="file" name="file" id="direct-file-decrypt-upload" class="file-input" required>
+                                                <label for="direct-file-decrypt-upload" class="file-drop-area">
+                                                    <div class="file-icon">
+                                                        <i class="fas fa-cloud-upload-alt"></i>
+                                                    </div>
+                                                    <div class="file-message">
+                                                        <span class="main-text">Drag & drop encrypted file here</span>
+                                                        <span class="sub-text">or click to browse files</span>
+                                                    </div>
+                                                </label>
+                                                <div id="direct-file-decrypt-info" class="file-info"></div>
+                                            </div>
+                                            <div class="d-grid">
+                                                <button type="submit" class="btn btn-primary btn-lg">
+                                                    <i class="fas fa-unlock me-2"></i>Decrypt File
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    
+                                    <!-- Direct Text Decryption -->
+                                    <div class="tab-pane fade" id="direct-text-decrypt" role="tabpanel">
+                                        <form action="/decrypt_text" method="post">
+                                            <input type="hidden" name="use_key" value="false">
+                                            <div class="form-group mb-4">
+                                                <textarea name="text" class="form-control" rows="6" placeholder="Enter encrypted text to decrypt..." required></textarea>
+                                            </div>
+                                            <div class="d-grid">
+                                                <button type="submit" class="btn btn-primary btn-lg">
+                                                    <i class="fas fa-unlock me-2"></i>Decrypt Text
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    
+                                    <!-- File Decryption with Key -->
+                                    <div class="tab-pane fade" id="key-file-decrypt" role="tabpanel">
+                                        <form action="/decrypt_file" method="post" enctype="multipart/form-data">
+                                            <input type="hidden" name="use_key" value="true">
+                                            <div class="form-group mb-4">
+                                                <label for="file-decrypt-key" class="form-label">Decryption Key (Required)</label>
+                                                <input type="text" name="key" id="file-decrypt-key" class="form-control" placeholder="Enter your encryption key" required>
+                                            </div>
+                                            <div class="file-upload-container mb-4">
+                                                <input type="file" name="file" id="key-file-decrypt-upload" class="file-input" required>
+                                                <label for="key-file-decrypt-upload" class="file-drop-area">
+                                                    <div class="file-icon">
+                                                        <i class="fas fa-cloud-upload-alt"></i>
+                                                    </div>
+                                                    <div class="file-message">
+                                                        <span class="main-text">Drag & drop encrypted file here</span>
+                                                        <span class="sub-text">or click to browse files</span>
+                                                    </div>
+                                                </label>
+                                                <div id="key-file-decrypt-info" class="file-info"></div>
+                                            </div>
+                                            <div class="d-grid">
+                                                <button type="submit" class="btn btn-primary btn-lg">
+                                                    <i class="fas fa-unlock me-2"></i>Decrypt File with Key
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    
+                                    <!-- Text Decryption with Key -->
+                                    <div class="tab-pane fade" id="key-text-decrypt" role="tabpanel">
+                                        <form action="/decrypt_text" method="post">
+                                            <input type="hidden" name="use_key" value="true">
+                                            <div class="form-group mb-4">
+                                                <label for="text-decrypt-key" class="form-label">Decryption Key (Required)</label>
+                                                <input type="text" name="key" id="text-decrypt-key" class="form-control" placeholder="Enter your encryption key" required>
+                                            </div>
+                                            <div class="form-group mb-4">
+                                                <textarea name="text" class="form-control" rows="6" placeholder="Enter encrypted text to decrypt..." required></textarea>
+                                            </div>
+                                            <div class="d-grid">
+                                                <button type="submit" class="btn btn-primary btn-lg">
+                                                    <i class="fas fa-unlock me-2"></i>Decrypt Text with Key
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- STEGANOGRAPHIC TAB -->
+                            <div class="tab-pane fade" id="stegano-content" role="tabpanel">
+                                <ul class="nav nav-pills nav-justified mb-4" id="steganoTabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="encode-secret-tab" data-bs-toggle="pill" data-bs-target="#encode-secret" type="button" role="tab">
+                                            <i class="fas fa-lock me-2"></i> Encode Secret
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="decode-secret-tab" data-bs-toggle="pill" data-bs-target="#decode-secret" type="button" role="tab">
+                                            <i class="fas fa-unlock me-2"></i> Decode Secret
+                                        </button>
+                                    </li>
+                                </ul>
+
+                                <div class="tab-content" id="steganoTabsContent">
+                                    <!-- Encode Secret -->
+                                    <div class="tab-pane fade show active" id="encode-secret" role="tabpanel">
+                                        <form id="generate-form">
+                                            <div class="form-group mb-4">
+                                                <label for="prompt" class="form-label">Image Prompt</label>
+                                                <textarea id="prompt" name="prompt" class="form-control" rows="3" placeholder="Describe the image you want to generate..." required></textarea>
+                                            </div>
+                                            <div class="form-group mb-4">
+                                                <label for="model" class="form-label">AI Model</label>
+                                                <select id="model" name="model" class="form-select">
+                                                    <option value="stabilityai/stable-diffusion-3.5-large">Stable Diffusion 3.5 Large</option>
+                                                    <option value="stabilityai/stable-diffusion-3.0-base">Stable Diffusion 3.0 Base</option>
+                                                    <option value="stabilityai/stable-diffusion-2-1">Stable Diffusion 2.1</option>
+                                                    <option value="runwayml/stable-diffusion-v1-5">Stable Diffusion 1.5</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group mb-4">
+                                                <label for="secret_message" class="form-label">Secret Message</label>
+                                                <textarea id="secret_message" name="secret_message" class="form-control" rows="3" placeholder="Enter your secret message to hide in the image..." required></textarea>
+                                            </div>
+                                            <div class="form-group mb-4">
+                                                <label for="password" class="form-label">Encryption Password (Optional)</label>
+                                                <input type="password" id="password" name="password" class="form-control" placeholder="Add an extra layer of security...">
+                                            </div>
+                                            <div class="d-grid">
+                                                <button type="submit" id="generate-btn" class="btn btn-primary btn-lg">
+                                                    <i class="fas fa-magic me-2"></i> Generate Steganographic Image
+                                                </button>
+                                            </div>
+                                        </form>
+                                        <div id="result-container" class="result-container mt-4" style="display: none;">
+                                            <img id="generated-image" class="img-fluid rounded" src="" alt="Generated Image">
+                                            <div class="d-flex justify-content-center gap-3 mt-3">
+                                                <button id="download-btn" class="btn btn-success">
+                                                    <i class="fas fa-download"></i> Download Image
+                                                </button>
+                                                <button id="share-btn" class="btn btn-secondary">
+                                                    <i class="fas fa-share-alt"></i> Share Image
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Decode Secret -->
+                                    <div class="tab-pane fade" id="decode-secret" role="tabpanel">
+                                        <form id="decrypt-form">
+                                            <div class="file-upload-container mb-4">
+                                                <input type="file" id="file-input" class="file-input" accept="image/*" required>
+                                                <label for="file-input" class="file-drop-area">
+                                                    <div class="file-icon">
+                                                        <i class="fas fa-cloud-upload-alt"></i>
+                                                    </div>
+                                                    <div class="file-message">
+                                                        <span class="main-text">Drag & drop image here</span>
+                                                        <span class="sub-text">or click to browse files</span>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                            <div class="form-group mb-4">
+                                                <label for="decrypt-password" class="form-label">Decryption Password (if required)</label>
+                                                <input type="password" id="decrypt-password" name="password" class="form-control" placeholder="Enter password if needed">
+                                            </div>
+                                            <div class="d-grid">
+                                                <button type="submit" id="decrypt-btn" class="btn btn-primary btn-lg">
+                                                    <i class="fas fa-key me-2"></i> Decrypt Message
+                                                </button>
+                                            </div>
+                                        </form>
+                                        <div id="decrypted-message" class="alert alert-success mt-4" style="display: none;">
+                                            <h4>Decrypted Message:</h4>
+                                            <p id="message-content"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <footer class="footer mt-auto py-4">
+            <div class="container text-center">
+                <p>&copy; 2025 CipherVaultX. All rights reserved.</p>
+            </div>
+        </footer>
+    
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            // File upload handling for each uploader
+            const fileInputs = ['direct-file-upload', 'key-file-upload', 'direct-file-decrypt-upload', 'key-file-decrypt-upload'];
+            
+            fileInputs.forEach(inputId => {
+                document.getElementById(inputId).addEventListener('change', function(e) {
+                    const fileInput = e.target;
+                    const infoId = inputId.replace('upload', 'info');
+                    const fileInfo = document.getElementById(infoId);
+                    
+                    if (fileInput.files.length > 0) {
+                        const file = fileInput.files[0];
+                        const fileSize = (file.size / 1024).toFixed(2);
+                        fileInfo.innerHTML = `
+                            <div class="selected-file">
+                                <i class="fas fa-file me-2"></i>
+                                <span class="file-name">${file.name}</span>
+                                <span class="file-size">(${fileSize} KB)</span>
+                            </div>
+                        `;
+                        
+                        fileInput.closest('.file-upload-container').querySelector('.file-drop-area').classList.add('has-file');
+                    } else {
+                        fileInfo.innerHTML = '';
+                        fileInput.closest('.file-upload-container').querySelector('.file-drop-area').classList.remove('has-file');
+                    }
+                });
+            });
+            
+            // Add drag and drop functionality to all drop areas
+            document.querySelectorAll('.file-drop-area').forEach(dropArea => {
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    dropArea.addEventListener(eventName, preventDefaults, false);
+                });
+                
+                function preventDefaults(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    dropArea.addEventListener(eventName, highlight, false);
+                });
+                
+                ['dragleave', 'drop'].forEach(eventName => {
+                    dropArea.addEventListener(eventName, unhighlight, false);
+                });
+                
+                function highlight() {
+                    dropArea.classList.add('highlight');
+                }
+                
+                function unhighlight() {
+                    dropArea.classList.remove('highlight');
+                }
+                
+                dropArea.addEventListener('drop', handleDrop, false);
+                
+                function handleDrop(e) {
+                    const dt = e.dataTransfer;
+                    const files = dt.files;
+                    const fileInput = dropArea.parentElement.querySelector('.file-input');
+                    fileInput.files = files;
+                    const event = new Event('change');
+                    fileInput.dispatchEvent(event);
+                }
+            });
+            
+            // Generate key buttons
+            document.getElementById('generate-file-key').addEventListener('click', function() {
+                fetch('/generate_key', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById('file-encrypt-key').value = data.key;
+                        }
+                    });
+            });
+            
+            document.getElementById('generate-text-key').addEventListener('click', function() {
+                fetch('/generate_key', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById('text-encrypt-key').value = data.key;
+                        }
+                    });
+            });
+            
+            // Theme toggle
+            const themeToggle = document.getElementById('theme-toggle');
+            const htmlElement = document.documentElement;
+            
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                htmlElement.setAttribute('data-theme', savedTheme);
+            } else {
+                const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (prefersDarkMode) {
+                    htmlElement.setAttribute('data-theme', 'dark');
+                }
+            }
+            updateToggleButton();
+            
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = htmlElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                htmlElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                
+                updateToggleButton();
+            });
+            
+            function updateToggleButton() {
+                const currentTheme = htmlElement.getAttribute('data-theme');
+                themeToggle.classList.toggle('dark-mode-active', currentTheme === 'dark');
+            }
+        </script>
+    </body>
+    </html>
