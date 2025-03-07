@@ -60,6 +60,7 @@
                         <div class="copy-message" id="key-copy-message">Key copied to clipboard!</div>
                     </div>
                     
+                    {% if encrypted_text %}
                     <div class="result-section mb-4">
                         <label class="result-label">Encrypted Text</label>
                         <div class="input-group">
@@ -70,9 +71,27 @@
                         </div>
                         <div class="copy-message" id="text-copy-message">Text copied to clipboard!</div>
                     </div>
+                    {% endif %}
                     
-                    <div class="d-grid gap-2">
-                        <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+                    {% if filename and file_id %}
+                    <div class="result-section mb-4">
+                        <label class="result-label">Encrypted File</label>
+                        <div class="file-result">
+                            <div class="file-info mb-3">
+                                <i class="fas fa-file-alt me-2"></i>
+                                <span>{{ filename }}</span>
+                            </div>
+                            <div class="d-grid">
+                                <a href="{{ url_for('download_encrypted_file', file_id=file_id) }}" class="btn btn-primary">
+                                    <i class="fas fa-download me-2"></i>Download Encrypted File
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-lg">
                             <i class="fas fa-home me-2"></i>Back to Home
                         </a>
                     </div>
