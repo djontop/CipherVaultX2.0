@@ -1,4 +1,3 @@
-/* static/css/style.css */
 :root {
     /* Light theme variables */
     --primary: #4f46e5;
@@ -500,7 +499,6 @@ textarea.form-control {
 }
 
 
-/* File result styling */
 .file-result {
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
