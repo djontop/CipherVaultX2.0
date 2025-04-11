@@ -30,21 +30,26 @@
 
         <div class="container main-container">
             <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="app-header text-center mb-5">
-                        <h1>Secure File & Text Encryption</h1>
+                <div class="col-lg-8 col-md-10 col-sm-12">
+                    <div class="app-header text-center mb-4 mb-md-5">
+                        <h1 class="responsive-heading">Secure File & Text Encryption</h1>
                     </div>
                     
                     <div class="app-card">
-                        <ul class="nav nav-pills nav-justified mb-4" id="mainTabs" role="tablist">
+                        <ul class="nav nav-pills nav-justified mb-3 mb-md-4" id="mainTabs" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="encrypt-tab" data-bs-toggle="pill" data-bs-target="#encrypt-content" type="button" role="tab">
+                                <button class="nav-link {% if active_tab != 'decrypt' and active_tab != 'steganography' %}active{% endif %}" id="encrypt-tab" data-bs-toggle="pill" data-bs-target="#encrypt-content" type="button" role="tab">
                                     <i class="fas fa-lock me-2"></i>Encrypt
                                 </button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="decrypt-tab" data-bs-toggle="pill" data-bs-target="#decrypt-content" type="button" role="tab">
+                                <button class="nav-link {% if active_tab == 'decrypt' %}active{% endif %}" id="decrypt-tab" data-bs-toggle="pill" data-bs-target="#decrypt-content" type="button" role="tab">
                                     <i class="fas fa-unlock me-2"></i>Decrypt
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link {% if active_tab == 'steganography' %}active{% endif %}" id="steganography-tab" data-bs-toggle="pill" data-bs-target="#steganography-content" type="button" role="tab">
+                                    <i class="fas fa-image me-2"></i>Steganography
                                 </button>
                             </li>
                         </ul>
@@ -52,7 +57,7 @@
                         <div class="tab-content" id="mainTabsContent">
                             <!-- ENCRYPTION TAB -->
                             <div class="tab-pane fade show active" id="encrypt-content" role="tabpanel">
-                                <ul class="nav nav-pills nav-justified mb-4" id="encryptTabs" role="tablist">
+                                <ul class="nav nav-pills nav-justified mb-3 mb-md-4" id="encryptTabs" role="tablist">
                                     <li class="nav-item" role="presentation">
                                         <button class="nav-link active" id="direct-file-encrypt-tab" data-bs-toggle="pill" 
                                                 data-bs-target="#direct-file-encrypt" type="button" role="tab">
@@ -181,8 +186,8 @@
                             </div>
                             
                             <!-- DECRYPTION TAB -->
-                            <div class="tab-pane fade" id="decrypt-content" role="tabpanel">
-                                <ul class="nav nav-pills nav-justified mb-4" id="decryptTabs" role="tablist">
+                            <div class="tab-pane fade {% if active_tab == 'decrypt' %}show active{% endif %}" id="decrypt-content" role="tabpanel">
+                                <ul class="nav nav-pills nav-justified mb-3 mb-md-4" id="decryptTabs" role="tablist">
                                     <li class="nav-item" role="presentation">
                                         <button class="nav-link active" id="direct-file-decrypt-tab" data-bs-toggle="pill" 
                                                 data-bs-target="#direct-file-decrypt" type="button" role="tab">
@@ -299,6 +304,130 @@
                                     </div>
                                 </div>
                             </div>
+                            
+                            <!-- STEGANOGRAPHY TAB -->
+                            <div class="tab-pane fade {% if active_tab == 'steganography' %}show active{% endif %}" id="steganography-content" role="tabpanel">
+                                <ul class="nav nav-pills nav-justified mb-3 mb-md-4" id="steganoTabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="hide-message-tab" data-bs-toggle="pill" 
+                                                data-bs-target="#hide-message-content" type="button" role="tab">
+                                            <i class="fas fa-eye-slash me-2"></i>Hide Message
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="reveal-message-tab" data-bs-toggle="pill" 
+                                                data-bs-target="#reveal-message-content" type="button" role="tab">
+                                            <i class="fas fa-eye me-2"></i>Reveal Message
+                                        </button>
+                                    </li>
+                                </ul>
+                                
+                                <div class="tab-content" id="steganoTabsContent">
+                                    <!-- Hide Message in Image -->
+                                    <div class="tab-pane fade show active" id="hide-message-content" role="tabpanel">
+                                        <form action="{{ url_for('hide_message') }}" method="post" enctype="multipart/form-data" id="hide-message-form">
+                                            <div class="form-group mb-4">
+                                                <label for="stegano-message" class="form-label">Message to Hide</label>
+                                                <textarea name="message" id="stegano-message" class="form-control" rows="4" placeholder="Enter message to hide in image..." required></textarea>
+                                            </div>
+                                            
+                                            <div class="form-check form-switch mb-4">
+                                                <input class="form-check-input" type="checkbox" id="use-ai-toggle">
+                                                <input type="hidden" name="use_ai" id="use-ai-value" value="false">
+                                                <label class="form-check-label" for="use-ai-toggle">Use AI-generated image</label>
+                                            </div>
+                                            
+                                            <div id="upload-image-section" class="mb-4">
+                                                <div class="file-upload-container">
+                                                    <input type="file" name="image" id="hide-image-upload" class="file-input" accept="image/*" required>
+                                                    <label for="hide-image-upload" class="file-drop-area">
+                                                        <div class="file-icon">
+                                                            <i class="fas fa-cloud-upload-alt"></i>
+                                                        </div>
+                                                        <div class="file-message">
+                                                            <span class="main-text">Drag & drop image here</span>
+                                                            <span class="sub-text">PNG format recommended</span>
+                                                        </div>
+                                                    </label>
+                                                    <div id="hide-image-info" class="file-info"></div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div id="ai-image-section" class="mb-4" style="display: none;">
+                                                <div class="alert alert-info">
+                                                    <div class="d-flex">
+                                                        <div class="alert-icon me-3">
+                                                            <i class="fas fa-info-circle"></i>
+                                                        </div>
+                                                        <div>
+                                                            An AI image will be generated based on your secret message content. You can also provide a custom prompt if you prefer specific imagery.
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="form-group mb-3">
+                                                    <label for="image-prompt" class="form-label">Custom Image Description (Optional)</label>
+                                                    <div class="input-group">
+                                                        <input type="text" name="prompt" id="image-prompt" class="form-control" placeholder="Provide a custom prompt or leave blank to generate one based on your message">
+                                                        <button type="button" class="btn btn-outline-secondary" id="generate-preview-btn">
+                                                            <i class="fas fa-eye me-1"></i>Preview
+                                                        </button>
+                                                    </div>
+                                                    <div class="form-text text-muted">
+                                                        If left blank, an image will be intelligently created based on keywords from your hidden message.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div id="preview-container" class="text-center mb-3" style="display: none;">
+                                                <div class="card">
+                                                    <div class="card-body p-2 p-md-3">
+                                                        <h5 class="card-title">Image Preview</h5>
+                                                        <div id="preview-loading" class="my-2 my-md-3">
+                                                            <div class="spinner-border text-primary" role="status">
+                                                                <span class="visually-hidden">Loading...</span>
+                                                            </div>
+                                                            <p class="mt-2">Generating image... This may take a few seconds.</p>
+                                                        </div>
+                                                        <img id="preview-image" class="img-fluid rounded mb-2" style="max-height: 300px; display: none;">
+                                                        <div id="preview-error" class="alert alert-danger mt-2 mt-md-3" style="display: none;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="d-grid">
+                                                <button type="submit" class="btn btn-primary btn-lg">
+                                                    <i class="fas fa-eye-slash me-2"></i>Hide Message in Image
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    
+                                    <!-- Reveal Hidden Message -->
+                                    <div class="tab-pane fade" id="reveal-message-content" role="tabpanel">
+                                        <form action="{{ url_for('reveal_message') }}" method="post" enctype="multipart/form-data">
+                                            <div class="file-upload-container mb-4">
+                                                <input type="file" name="image" id="reveal-image-upload" class="file-input" accept="image/*" required>
+                                                <label for="reveal-image-upload" class="file-drop-area">
+                                                    <div class="file-icon">
+                                                        <i class="fas fa-cloud-upload-alt"></i>
+                                                    </div>
+                                                    <div class="file-message">
+                                                        <span class="main-text">Drag & drop steganography image</span>
+                                                        <span class="sub-text">Upload image with hidden message</span>
+                                                    </div>
+                                                </label>
+                                                <div id="reveal-image-info" class="file-info"></div>
+                                            </div>
+                                            <div class="d-grid">
+                                                <button type="submit" class="btn btn-primary btn-lg">
+                                                    <i class="fas fa-eye me-2"></i>Reveal Hidden Message
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -314,7 +443,7 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
             // File upload handling for each uploader
-            const fileInputs = ['direct-file-upload', 'key-file-upload', 'direct-file-decrypt-upload', 'key-file-decrypt-upload'];
+            const fileInputs = ['direct-file-upload', 'key-file-upload', 'direct-file-decrypt-upload', 'key-file-decrypt-upload', 'hide-image-upload', 'reveal-image-upload'];
             
             fileInputs.forEach(inputId => {
                 document.getElementById(inputId).addEventListener('change', function(e) {
@@ -430,6 +559,108 @@
                 const currentTheme = htmlElement.getAttribute('data-theme');
                 themeToggle.classList.toggle('dark-mode-active', currentTheme === 'dark');
             }
+            
+            // AI Image Generation for Steganography
+            const useAiToggle = document.getElementById('use-ai-toggle');
+            const useAiValue = document.getElementById('use-ai-value');
+            const uploadImageSection = document.getElementById('upload-image-section');
+            const aiImageSection = document.getElementById('ai-image-section');
+            const hideImageUpload = document.getElementById('hide-image-upload');
+            const imagePrompt = document.getElementById('image-prompt');
+            const generatePreviewBtn = document.getElementById('generate-preview-btn');
+            const previewContainer = document.getElementById('preview-container');
+            const previewLoading = document.getElementById('preview-loading');
+            const previewImage = document.getElementById('preview-image');
+            const previewError = document.getElementById('preview-error');
+            
+            useAiToggle.addEventListener('change', function() {
+                const useAi = this.checked;
+                useAiValue.value = useAi.toString();
+                
+                if (useAi) {
+                    uploadImageSection.style.display = 'none';
+                    aiImageSection.style.display = 'block';
+                    hideImageUpload.required = false;
+                    imagePrompt.required = true;
+                } else {
+                    uploadImageSection.style.display = 'block';
+                    aiImageSection.style.display = 'none';
+                    hideImageUpload.required = true;
+                    imagePrompt.required = false;
+                    
+                    // Reset preview
+                    previewContainer.style.display = 'none';
+                    previewImage.style.display = 'none';
+                    previewError.style.display = 'none';
+                }
+            });
+            
+            generatePreviewBtn.addEventListener('click', function() {
+                const prompt = imagePrompt.value.trim();
+                const message = document.getElementById('stegano-message').value.trim();
+                
+                // Show loading state
+                previewContainer.style.display = 'block';
+                previewLoading.style.display = 'block';
+                previewImage.style.display = 'none';
+                previewError.style.display = 'none';
+                
+                // Call API to generate image
+                const formData = new FormData();
+                formData.append('prompt', prompt);
+                formData.append('message', message);
+                
+                fetch('/generate_image', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    previewLoading.style.display = 'none';
+                    
+                    if (data.success) {
+                        previewImage.src = data.image;
+                        previewImage.style.display = 'block';
+                        
+                        // Display the prompt used (if different from user input and if prompt is returned)
+                        if (!prompt && data.prompt) {
+                            const promptInfo = document.createElement('div');
+                            promptInfo.className = 'mt-2 text-muted';
+                            promptInfo.style.fontSize = '0.9rem';
+                            promptInfo.innerHTML = `<strong>Generated prompt:</strong> "${data.prompt}"`;
+                            
+                            // Remove any existing prompt info
+                            const existingInfo = document.getElementById('preview-prompt-info');
+                            if (existingInfo) existingInfo.remove();
+                            
+                            // Add ID for future reference
+                            promptInfo.id = 'preview-prompt-info';
+                            
+                            // Add after the image
+                            previewImage.parentNode.insertBefore(promptInfo, previewImage.nextSibling);
+                        } else if (existingInfo = document.getElementById('preview-prompt-info')) {
+                            // If no prompt is returned but there was existing prompt info, remove it
+                            existingInfo.remove();
+                        }
+                    } else {
+                        previewError.textContent = data.error || 'Failed to generate image';
+                        previewError.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    previewLoading.style.display = 'none';
+                    previewError.textContent = 'Network error: ' + error.message;
+                    previewError.style.display = 'block';
+                });
+            });
+            
+            // Ensure form validation before submission
+            document.getElementById('hide-message-form').addEventListener('submit', function(e) {
+                const useAi = useAiToggle.checked;
+                
+                // No validation needed for empty prompt since it's optional now
+                return true;
+            });
         </script>
     </body>
-    </html>
+</html>

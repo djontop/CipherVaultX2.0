@@ -33,10 +33,20 @@
             <div class="col-lg-8">
                 <div class="app-card result-card">
                     <div class="success-icon">
+                        {% if type == "steganography" %}
+                        <i class="fas fa-eye"></i>
+                        {% else %}
                         <i class="fas fa-unlock-alt"></i>
+                        {% endif %}
                     </div>
                     
-                    <h2 class="text-center mb-4">Decryption Complete</h2>
+                    <h2 class="text-center mb-4">
+                        {% if type == "steganography" %}
+                        Message Revealed
+                        {% else %}
+                        Decryption Complete
+                        {% endif %}
+                    </h2>
 
                     <div class="alert alert-success">
                         <div class="d-flex">
@@ -44,13 +54,24 @@
                                 <i class="fas fa-check-circle"></i>
                             </div>
                             <div>
-                                <strong>Success:</strong> Your text has been successfully decrypted.
+                                <strong>Success:</strong> 
+                                {% if type == "steganography" %}
+                                Hidden message has been successfully revealed.
+                                {% else %}
+                                Your text has been successfully decrypted.
+                                {% endif %}
                             </div>
                         </div>
                     </div>
 
                     <div class="result-section mb-4">
-                        <label class="result-label">Decrypted Text</label>
+                        <label class="result-label">
+                            {% if type == "steganography" %}
+                            Hidden Message
+                            {% else %}
+                            Decrypted Text
+                            {% endif %}
+                        </label>
                         <div class="input-group">
                             <textarea class="form-control" rows="6" readonly>{{ decrypted_text }}</textarea>
                             <button class="btn btn-outline-secondary copy-btn" type="button" data-copy="decrypted_text">
@@ -59,7 +80,7 @@
                         </div>
                         <div class="copy-message" id="decrypted_text-copy-message">Text copied to clipboard!</div>
                     </div>
-
+ 
                     <div class="d-grid gap-2">
                         <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
                             <i class="fas fa-home me-2"></i>Back to Home
