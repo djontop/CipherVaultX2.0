@@ -17,12 +17,12 @@ from datetime import datetime
 
 # Configuration settings
 CONFIG = {
-    'USE_MESSAGE_FOR_PROMPT': False,  
+    'USE_MESSAGE_FOR_PROMPT': True,  # Controls whether hidden messages are used to generate image prompts
     'DEFAULT_PROMPT_STYLE': 'artful',  # Options: 'artful', 'minimal', 'technical'
     'SHOW_PROMPT_TO_USER': True,  # Whether to show the generated prompt to user in preview
-    'IMAGE_MODEL': 'runwayml/stable-diffusion-v1-5',  # Model to use for image generation
+    'IMAGE_MODEL': 'black-forest-labs/FLUX.1-dev',  # Model to use for image generation
     'MAX_KEYWORDS_FROM_MESSAGE': 5,  # Maximum keywords to extract from message
-    'API_KEY': 'hf_YwTyWIybPuOL',  # Hugging Face API key
+    'API_KEY': 'hf_YwTyWIybPuOKIsL',  # Hugging Face API key
     'DB_PATH': 'cipher_stats.db',  # SQLite database path
     'TEMP_STORAGE_TIMEOUT': 3600,  # 1 hour timeout for temp storage (in seconds)
 }
@@ -39,6 +39,9 @@ encrypted_files = {}
 
 # Dictionary to temporarily store decrypted files
 decrypted_files = {}
+
+# Dictionary to temporarily store AI preview images
+ai_preview_images = {}
 
 # Generate a secure token for temporary file access
 def generate_download_token():
@@ -84,6 +87,15 @@ def cleanup_old_files():
     
     for token in tokens_to_remove:
         del decrypted_files[token]
+        
+    # Clean up AI preview images
+    tokens_to_remove = []
+    for token, image_info in ai_preview_images.items():
+        if current_time - image_info['timestamp'] > CONFIG['TEMP_STORAGE_TIMEOUT']:
+            tokens_to_remove.append(token)
+    
+    for token in tokens_to_remove:
+        del ai_preview_images[token]
 
 # Initialize database
 def init_db():
@@ -196,7 +208,7 @@ def decrypt_text(encrypted_text, key=None):
     # Ensure key is not None before creating the Fernet instance
     if key is None:
         raise Exception("Decryption key is required and was not provided.")
-        
+    
     fernet = Fernet(key)
     decrypted_data = fernet.decrypt(encrypted_text)
     return decrypted_data.decode('utf-8')
@@ -411,11 +423,11 @@ def encrypt_file_route():
         # Store encrypted data temporarily and get token
         download_filename = f"encrypted_{filename}"
         token = store_encrypted_file(encrypted_data, download_filename)
-        
+
         end_time = time.time()  # End timing
         time_taken = (end_time - start_time) * 1000  # Convert to milliseconds
         print(f"Encryption Time: {time_taken:.2f} ms")  # Print to console
-        
+
         # Log the operation
         log_operation('file_encryption', file_size=file_size, processing_time=time_taken, file_type=file_type)
         
@@ -431,7 +443,7 @@ def encrypt_file_route():
 
     except Exception as e:
         return render_template('error.html', error=str(e))
-
+    
 @app.route('/decrypt_file', methods=['POST'])
 def decrypt_file_route():
     use_key = request.form.get('use_key') == 'true'
@@ -464,7 +476,7 @@ def decrypt_file_route():
         end_time = time.time()  # End timing
         time_taken = (end_time - start_time) * 1000  # Convert to milliseconds
         print(f"Decryption Time: {time_taken:.2f} ms")  # Print to console
-        
+
         # Log the operation
         log_operation('file_decryption', file_size=file_size, processing_time=time_taken, file_type=file_type)
         
@@ -590,22 +602,33 @@ def hide_message():
         
         # Handle AI-generated image
         if use_ai:
-            # Get user-provided prompt or generate one from the message
-            user_prompt = request.form.get('prompt', '').strip()
+            # First check if we have a preview token
+            preview_token = request.form.get('preview_token', '').strip()
             
-            if user_prompt:
-                # Use user's custom prompt if provided
-                prompt = user_prompt
+            if preview_token and preview_token in ai_preview_images:
+                # Use the previously generated preview image if available
+                image_info = ai_preview_images[preview_token]
+                image_data = image_info['data']
+                # Remove from storage to free memory
+                del ai_preview_images[preview_token]
+                file_type = 'ai_image_png'
             else:
-                # Generate a prompt based on the message content or default
-                prompt = generate_prompt_from_message(message)
+                # No preview image available, generate a new one
+                user_prompt = request.form.get('prompt', '').strip()
                 
-            # Log the generated prompt (for debugging)
-            print(f"Using prompt: {prompt}")
-            
-            # Generate the image
-            image_data = generate_ai_image(prompt)
-            file_type = 'ai_image_png'
+                if user_prompt:
+                    # Use user's custom prompt if provided
+                    prompt = user_prompt
+                else:
+                    # Generate a prompt based on the message content or default
+                    prompt = generate_prompt_from_message(message)
+                    
+                # Log the generated prompt (for debugging)
+                print(f"Using prompt: {prompt}")
+                
+                # Generate the image
+                image_data = generate_ai_image(prompt)
+                file_type = 'ai_image_png'
         # Handle uploaded image
         else:
             if 'image' not in request.files or request.files['image'].filename == '':
@@ -694,13 +717,22 @@ def generate_image_route():
         image_data = generate_ai_image(prompt)
         image_b64 = base64.b64encode(image_data).decode('utf-8')
         
+        # Store the generated image with a token
+        preview_token = secrets.token_urlsafe(16)
+        ai_preview_images[preview_token] = {
+            'data': image_data,
+            'prompt': prompt,
+            'timestamp': time.time()
+        }
+        
         # Determine whether to show the prompt to the user
         show_prompt = CONFIG['SHOW_PROMPT_TO_USER']
         
         return jsonify({
             'success': True, 
             'image': f"data:image/png;base64,{image_b64}",
-            'prompt': prompt if show_prompt else None
+            'prompt': prompt if show_prompt else None,
+            'preview_token': preview_token
         })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})

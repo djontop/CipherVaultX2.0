@@ -1,7 +1,8 @@
 :root {
-    --primary: #4f46e5;
-    --primary-light: #6366f1;
-    --primary-dark: #4338ca;
+    /* Light theme variables */
+    --primary: #f0b800;
+    --primary-light: #f1d763;
+    --primary-dark: #caa338;
     --bg-color: #f9fafb;
     --card-bg: #ffffff;
     --text-color: #1f2937;
@@ -23,9 +24,10 @@
 }
 
 [data-theme="dark"] {
-    --primary: #6366f1;
-    --primary-light: #818cf8;
-    --primary-dark: #4f46e5;
+    /* Dark theme variables */
+    --primary: #f0b800;
+    --primary-light: #f1d763;
+    --primary-dark: #caa338;
     --bg-color: #111827;
     --card-bg: #1f2937;
     --text-color: #f3f4f6;
@@ -57,6 +59,7 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Theme toggle button */
 .theme-toggle-btn {
     background: none;
     border: none;
@@ -102,6 +105,7 @@ body {
     transform: rotate(0);
 }
 
+/* Navbar styling */
 .navbar {
     background-color: var(--navbar-bg);
     box-shadow: 0 1px 3px var(--shadow-color);
@@ -125,11 +129,13 @@ body {
     margin-left: 8px;
 }
 
+/* Main container */
 .main-container {
     padding: 3rem 1rem;
     flex-grow: 1;
 }
 
+/* App header */
 .app-header {
     margin-bottom: 2.5rem;
 }
@@ -148,6 +154,7 @@ body {
     margin: 0 auto;
 }
 
+/* App card */
 .app-card {
     background-color: var(--card-bg);
     border-radius: 1rem;
@@ -156,6 +163,7 @@ body {
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
+/* Nav pills */
 .nav-pills {
     margin-bottom: 2rem;
     gap: 0.5rem;
@@ -178,6 +186,7 @@ body {
     color: #ffffff;
 }
 
+/* File upload area */
 .file-upload-container {
     position: relative;
     margin-bottom: 2rem;
@@ -275,6 +284,7 @@ body {
     transition: color 0.3s ease;
 }
 
+/* Form elements */
 .form-control {
     padding: 0.75rem;
     border: 1px solid var(--input-border);
@@ -293,6 +303,7 @@ textarea.form-control {
     min-height: 160px;
 }
 
+/* Buttons */
 .btn {
     padding: 0.75rem 1.5rem;
     font-weight: 500;
@@ -332,6 +343,7 @@ textarea.form-control {
     border-color: var(--primary);
 }
 
+/* Features section */
 .app-features {
     margin-top: 3rem;
 }
@@ -379,6 +391,7 @@ textarea.form-control {
     transition: color 0.3s ease;
 }
 
+/* Footer */
 .footer {
     background-color: var(--footer-bg);
     border-top: 1px solid var(--border-color);
@@ -388,6 +401,7 @@ textarea.form-control {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
+/* Result page styles */
 .result-card {
     text-align: center;
 }
@@ -478,6 +492,7 @@ textarea.form-control {
     }
 }
 
+/* Additional dark mode specific styles */
 [data-theme="dark"] .form-control::placeholder {
     color: #9ca3af;
 }
@@ -486,6 +501,7 @@ textarea.form-control {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
+/* Enhance focus states for dark mode accessibility */
 [data-theme="dark"] .form-control:focus {
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.4);
 }
@@ -525,6 +541,7 @@ textarea.form-control {
     margin-right: 5px;
 }
 
+/* Responsive CSS Improvements */
 @media (max-width: 1200px) {
     .app-card {
         padding: 1.5rem;
@@ -677,6 +694,7 @@ textarea.form-control {
     }
 }
 
+/* Mobile-specific improvements for small screens */
 @media (max-width: 400px) {
     .app-header h1 {
         font-size: 1.3rem;
@@ -716,6 +734,7 @@ textarea.form-control {
     }
 }
 
+/* Fix for steganography preview container */
 #preview-container .card-body {
     padding: 1rem;
 }
@@ -726,6 +745,7 @@ textarea.form-control {
     margin: 0 auto;
 }
 
+/* Improve the layout of input groups on small screens */
 @media (max-width: 576px) {
     .input-group {
         flex-direction: column;
@@ -743,12 +763,14 @@ textarea.form-control {
         margin-left: 0 !important;
     }
     
+    /* Exception for the preview button */
     #generate-preview-btn {
         position: relative;
         margin-top: 0.5rem;
     }
 }
 
+/* Fix the spacing between tabs on very small screens */
 @media (max-width: 350px) {
     .nav-pills {
         gap: 0.1rem;
@@ -764,6 +786,7 @@ textarea.form-control {
     }
 }
 
+/* Improve form spacing on mobile */
 @media (max-width: 576px) {
     .form-group, .form-check {
         margin-bottom: 0.75rem;
@@ -774,6 +797,7 @@ textarea.form-control {
     }
 }
 
+/* Fix for footer on small screens */
 @media (max-width: 576px) {
     .footer {
         padding: 1rem 0;
@@ -781,24 +805,28 @@ textarea.form-control {
     }
 }
 
+/* Enhancement for dark mode on mobile */
 @media (max-width: 576px) {
     [data-theme="dark"] .app-card {
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 }
 
+/* Additional responsive improvements */
 .responsive-heading {
     font-weight: 700;
     transition: font-size 0.3s ease;
 }
 
 @media (max-width: 576px) {
+    /* Responsive padding for all form containers */
     .tab-pane .form-group,
     .tab-pane .file-upload-container {
         padding-left: 0.5rem;
         padding-right: 0.5rem;
     }
     
+    /* Responsive AI section */
     #ai-image-section .alert {
         padding: 0.75rem;
         margin-bottom: 0.75rem;
@@ -814,6 +842,7 @@ textarea.form-control {
         font-size: 0.75rem;
     }
     
+    /* Improve the preview container */
     #preview-container .card {
         margin-bottom: 0.75rem;
     }
@@ -834,6 +863,7 @@ textarea.form-control {
     }
 }
 
+/* Fix for tablets - improved tab navigation */
 @media (min-width: 577px) and (max-width: 991px) {
     .nav-pills .nav-item {
         flex: 1;
@@ -846,6 +876,7 @@ textarea.form-control {
     }
 }
 
+/* Fix for larger displays - maintain good readability */
 @media (min-width: 1400px) {
     .app-card {
         max-width: 1200px;
@@ -853,6 +884,7 @@ textarea.form-control {
     }
 }
 
+/* Ensure buttons maintain consistent appearance */
 @media (max-width: 576px) {
     .d-grid .btn {
         height: auto;
@@ -867,6 +899,7 @@ textarea.form-control {
     }
 }
 
+/* Improve scrolling on mobile */
 @media (max-width: 576px) {
     html, body {
         overflow-x: hidden;
@@ -877,6 +910,7 @@ textarea.form-control {
     }
 }
 
+/* Improve steganography toggle */
 .form-check.form-switch {
     display: flex;
     align-items: center;
@@ -893,6 +927,7 @@ textarea.form-control {
     }
 }
 
+/* Improve alert display on mobile */
 @media (max-width: 576px) {
     .alert .d-flex {
         align-items: flex-start;
@@ -903,6 +938,7 @@ textarea.form-control {
     }
 }
 
+/* Fix steganography alerts to be more mobile-friendly */
 @media (max-width: 480px) {
     #ai-image-section .alert {
         font-size: 0.8rem;
@@ -913,10 +949,12 @@ textarea.form-control {
         padding: 0.5rem;
     }
     
+    /* Make form elements touch-friendly */
     .form-control, .btn, .form-check-input, .file-drop-area {
         min-height: 38px;
     }
     
+    /* Improve touch target sizes */
     .form-check-input {
         width: 1.5em;
         height: 0.9em;
@@ -924,6 +962,7 @@ textarea.form-control {
     }
 }
 
+/* Simple Statistics Styles */
 .simple-stats {
     margin: 15px 0;
 }

@@ -377,6 +377,8 @@
                                                         If left blank, an image will be intelligently created based on keywords from your hidden message.
                                                     </div>
                                                 </div>
+                                                <!-- Hidden input for preview token -->
+                                                <input type="hidden" id="preview-token" name="preview_token" value="">
                                             </div>
                                             
                                             <div id="preview-container" class="text-center mb-3" style="display: none;">
@@ -629,7 +631,7 @@
                     uploadImageSection.style.display = 'none';
                     aiImageSection.style.display = 'block';
                     hideImageUpload.required = false;
-                    imagePrompt.required = true;
+                    imagePrompt.required = false;
                 } else {
                     uploadImageSection.style.display = 'block';
                     aiImageSection.style.display = 'none';
@@ -640,6 +642,7 @@
                     previewContainer.style.display = 'none';
                     previewImage.style.display = 'none';
                     previewError.style.display = 'none';
+                    document.getElementById('preview-token').value = '';
                 }
             });
             
@@ -664,34 +667,24 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    previewLoading.style.display = 'none';
-                    
                     if (data.success) {
+                        // Hide loading state
+                        previewLoading.style.display = 'none';
+                        
+                        // Update preview image
                         previewImage.src = data.image;
                         previewImage.style.display = 'block';
                         
-                        // Display the prompt used (if different from user input and if prompt is returned)
-                        if (!prompt && data.prompt) {
-                            const promptInfo = document.createElement('div');
-                            promptInfo.className = 'mt-2 text-muted';
-                            promptInfo.style.fontSize = '0.9rem';
-                            promptInfo.innerHTML = `<strong>Generated prompt:</strong> "${data.prompt}"`;
-                            
-                            // Remove any existing prompt info
-                            const existingInfo = document.getElementById('preview-prompt-info');
-                            if (existingInfo) existingInfo.remove();
-                            
-                            // Add ID for future reference
-                            promptInfo.id = 'preview-prompt-info';
-                            
-                            // Add after the image
-                            previewImage.parentNode.insertBefore(promptInfo, previewImage.nextSibling);
-                        } else if (existingInfo = document.getElementById('preview-prompt-info')) {
-                            // If no prompt is returned but there was existing prompt info, remove it
-                            existingInfo.remove();
+                        // Store the preview token
+                        document.getElementById('preview-token').value = data.preview_token;
+                        
+                        // Show prompt if available
+                        if (data.prompt && prompt === '') {
+                            imagePrompt.value = data.prompt;
                         }
                     } else {
-                        previewError.textContent = data.error || 'Failed to generate image';
+                        previewLoading.style.display = 'none';
+                        previewError.textContent = data.error || 'Unknown error generating image';
                         previewError.style.display = 'block';
                     }
                 })
