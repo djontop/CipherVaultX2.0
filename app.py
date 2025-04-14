@@ -14,18 +14,14 @@ import re
 import random
 import sqlite3
 from datetime import datetime
+from dotenv import load_dotenv
 
-# Configuration settings
-CONFIG = {
-    'USE_MESSAGE_FOR_PROMPT': True,  # Controls whether hidden messages are used to generate image prompts
-    'DEFAULT_PROMPT_STYLE': 'artful',  # Options: 'artful', 'minimal', 'technical'
-    'SHOW_PROMPT_TO_USER': True,  # Whether to show the generated prompt to user in preview
-    'IMAGE_MODEL': 'black-forest-labs/FLUX.1-dev',  # Model to use for image generation
-    'MAX_KEYWORDS_FROM_MESSAGE': 5,  # Maximum keywords to extract from message
-    'API_KEY': 'hf_YwTyWIybPuOKIsL',  # Hugging Face API key
-    'DB_PATH': 'cipher_stats.db',  # SQLite database path
-    'TEMP_STORAGE_TIMEOUT': 3600,  # 1 hour timeout for temp storage (in seconds)
-}
+# Load environment variables from .env file
+load_dotenv()
+
+# Configuration settings from environment variables
+def get_config(key, default=None):
+    return os.environ.get(key, default)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
@@ -70,10 +66,12 @@ def store_decrypted_file(data, filename):
 # Cleanup function to remove old files from temp storage
 def cleanup_old_files():
     current_time = time.time()
+    timeout = int(get_config('TEMP_STORAGE_TIMEOUT', 3600))
+    
     # Clean up encrypted files
     tokens_to_remove = []
     for token, file_info in encrypted_files.items():
-        if current_time - file_info['timestamp'] > CONFIG['TEMP_STORAGE_TIMEOUT']:
+        if current_time - file_info['timestamp'] > timeout:
             tokens_to_remove.append(token)
     
     for token in tokens_to_remove:
@@ -82,7 +80,7 @@ def cleanup_old_files():
     # Clean up decrypted files
     tokens_to_remove = []
     for token, file_info in decrypted_files.items():
-        if current_time - file_info['timestamp'] > CONFIG['TEMP_STORAGE_TIMEOUT']:
+        if current_time - file_info['timestamp'] > timeout:
             tokens_to_remove.append(token)
     
     for token in tokens_to_remove:
@@ -91,7 +89,7 @@ def cleanup_old_files():
     # Clean up AI preview images
     tokens_to_remove = []
     for token, image_info in ai_preview_images.items():
-        if current_time - image_info['timestamp'] > CONFIG['TEMP_STORAGE_TIMEOUT']:
+        if current_time - image_info['timestamp'] > timeout:
             tokens_to_remove.append(token)
     
     for token in tokens_to_remove:
@@ -99,7 +97,8 @@ def cleanup_old_files():
 
 # Initialize database
 def init_db():
-    conn = sqlite3.connect(CONFIG['DB_PATH'])
+    db_path = get_config('DB_PATH', 'cipher_stats.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS operation_stats (
@@ -119,7 +118,8 @@ init_db()
 
 # Function to log an operation
 def log_operation(operation_type, file_size=None, processing_time=None, file_type=None):
-    conn = sqlite3.connect(CONFIG['DB_PATH'])
+    db_path = get_config('DB_PATH', 'cipher_stats.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute(
         "INSERT INTO operation_stats (operation_type, timestamp, file_size, processing_time, file_type) VALUES (?, ?, ?, ?, ?)",
@@ -130,7 +130,8 @@ def log_operation(operation_type, file_size=None, processing_time=None, file_typ
 
 # Function to get operation statistics
 def get_stats():
-    conn = sqlite3.connect(CONFIG['DB_PATH'])
+    db_path = get_config('DB_PATH', 'cipher_stats.db')
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
     # Get counts by operation type
@@ -265,7 +266,7 @@ def reveal_message_from_image(image_data):
 def generate_prompt_from_message(message):
     """Generate an AI image prompt based on the hidden message content"""
     # Check if message-based prompt generation is enabled
-    if not CONFIG['USE_MESSAGE_FOR_PROMPT']:
+    if get_config('USE_MESSAGE_FOR_PROMPT', 'true').lower() != 'true':
         return get_default_prompt()
     
     # Get a random default prompt if message is not suitable
@@ -306,12 +307,12 @@ def generate_prompt_from_message(message):
         return get_default_prompt()
     
     # Take up to MAX_KEYWORDS_FROM_MESSAGE random keywords to build the prompt
-    max_keywords = CONFIG['MAX_KEYWORDS_FROM_MESSAGE']
+    max_keywords = int(get_config('MAX_KEYWORDS_FROM_MESSAGE', 5))
     if len(keywords) > max_keywords:
         keywords = random.sample(keywords, max_keywords)
     
     # Adjust style based on configuration
-    prompt_style = CONFIG['DEFAULT_PROMPT_STYLE'].lower()
+    prompt_style = get_config('DEFAULT_PROMPT_STYLE', 'artful').lower()
     
     if prompt_style == 'minimal':
         # Simpler prompt style with minimal artistry
@@ -357,8 +358,11 @@ def generate_prompt_from_message(message):
 def generate_ai_image(prompt):
     """Generate an image using Hugging Face Stable Diffusion"""
     try:
-        API_URL = f"https://api-inference.huggingface.co/models/{CONFIG['IMAGE_MODEL']}"
-        headers = {"Authorization": f"Bearer {CONFIG['API_KEY']}"}
+        model = get_config('IMAGE_MODEL', 'black-forest-labs/FLUX.1-dev')
+        api_key = get_config('API_KEY', '')
+        
+        API_URL = f"https://api-inference.huggingface.co/models/{model}"
+        headers = {"Authorization": f"Bearer {api_key}"}
         
         # Generate a random seed between 1 and 1,000,000
         random_seed = random.randint(1, 1000000)
@@ -694,7 +698,7 @@ def generate_image_route():
     
     # If prompt is empty, generate from message or use default
     if not prompt:
-        if message and CONFIG['USE_MESSAGE_FOR_PROMPT']:
+        if message and get_config('USE_MESSAGE_FOR_PROMPT', 'true').lower() == 'true':
             prompt = generate_prompt_from_message(message)
         else:
             # Use a random default prompt
@@ -726,7 +730,7 @@ def generate_image_route():
         }
         
         # Determine whether to show the prompt to the user
-        show_prompt = CONFIG['SHOW_PROMPT_TO_USER']
+        show_prompt = get_config('SHOW_PROMPT_TO_USER', 'true').lower() == 'true'
         
         return jsonify({
             'success': True, 
