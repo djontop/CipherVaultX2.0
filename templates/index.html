@@ -433,10 +433,58 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Simple Statistics Section -->
+        <div class="container mt-4 mb-4">
+            <div class="row justify-content-center">
+                <div class="col-lg-10 col-md-12">
+                    <div class="simple-stats">
+                        <div class="row row-cols-3 row-cols-md-6 g-2">
+                            <div class="col">
+                                <div class="stat-box">
+                                    <span class="stat-count" id="file-encrypt-count">0</span>
+                                    <span class="stat-label">Files Encrypted</span>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="stat-box">
+                                    <span class="stat-count" id="file-decrypt-count">0</span>
+                                    <span class="stat-label">Files Decrypted</span>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="stat-box">
+                                    <span class="stat-count" id="text-encrypt-count">0</span>
+                                    <span class="stat-label">Texts Encrypted</span>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="stat-box">
+                                    <span class="stat-count" id="text-decrypt-count">0</span>
+                                    <span class="stat-label">Texts Decrypted</span>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="stat-box">
+                                    <span class="stat-count" id="stegano-hide-count">0</span>
+                                    <span class="stat-label">Messages Hidden</span>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="stat-box">
+                                    <span class="stat-count" id="stegano-reveal-count">0</span>
+                                    <span class="stat-label">Messages Revealed</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     
         <footer class="footer mt-auto py-4">
             <div class="container text-center">
-                <p>&copy; 2025 CipherVaultX. All rights reserved.</p>
+                <p>&copy; 2025 CipherVaultX. All rights reserved. Developed by <a href="https://github.com/djontop" target="_blank">Manthan Vasant</a></p>
             </div>
         </footer>
     
@@ -660,6 +708,34 @@
                 
                 // No validation needed for empty prompt since it's optional now
                 return true;
+            });
+            
+            // Stats functionality
+            function fetchAndUpdateStats() {
+                fetch('/stats-data', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(stats => {
+                    // Update operation counts
+                    document.getElementById('file-encrypt-count').textContent = stats.counts['file_encryption'] || 0;
+                    document.getElementById('file-decrypt-count').textContent = stats.counts['file_decryption'] || 0;
+                    document.getElementById('text-encrypt-count').textContent = stats.counts['text_encryption'] || 0;
+                    document.getElementById('text-decrypt-count').textContent = stats.counts['text_decryption'] || 0;
+                    document.getElementById('stegano-hide-count').textContent = stats.counts['steganography_hide'] || 0;
+                    document.getElementById('stegano-reveal-count').textContent = stats.counts['steganography_reveal'] || 0;
+                })
+                .catch(error => {
+                    console.error('Error fetching statistics:', error);
+                });
+            }
+            
+            // Fetch stats when page loads
+            document.addEventListener('DOMContentLoaded', function() {
+                fetchAndUpdateStats();
             });
         </script>
     </body>
