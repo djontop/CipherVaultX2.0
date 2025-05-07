@@ -1278,3 +1278,227 @@ textarea.form-control {
 .dark-mode .document-preview {
     background-color: var(--bg-dark-secondary);
 }
+
+/* Loader Styles */
+.loader-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--background-color, #ffffff);
+    z-index: 9999;
+    transition: opacity 0.5s ease-out;
+}
+
+.loader-container.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loader-logo {
+    width: 150px;
+    height: 150px;
+    margin-bottom: 20px;
+    animation: pulse 2s infinite, spin 15s infinite linear;
+    box-shadow: 0 0 30px rgba(74, 108, 247, 0.3);
+    border-radius: 50%;
+}
+
+.loader-progress {
+    width: 280px;
+    height: 8px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 25px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.loader-bar {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 50%, var(--primary) 100%);
+    background-size: 200% 100%;
+    border-radius: 10px;
+    transition: width 10s ease-in-out;
+    box-shadow: 0 0 8px var(--primary);
+    animation: shimmer 2s infinite linear;
+}
+
+.loader-text {
+    margin-top: 15px;
+    font-size: 16px;
+    color: var(--text-color, #333);
+    font-family: 'Inter', sans-serif;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: scale(1) rotate(0deg);
+    }
+    25% {
+        transform: scale(1.05) rotate(90deg);
+    }
+    50% {
+        transform: scale(1) rotate(180deg);
+    }
+    75% {
+        transform: scale(1.05) rotate(270deg);
+    }
+    100% {
+        transform: scale(1) rotate(360deg);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 100% 0;
+    }
+    100% {
+        background-position: 0 0;
+    }
+}
+
+/* Dark mode support for loader */
+html[data-theme="dark"] .loader-container {
+    background-color: var(--background-color, #121212);
+}
+
+html[data-theme="dark"] .loader-text {
+    color: var(--text-color, #e0e0e0);
+}
+
+html[data-theme="dark"] .loader-progress {
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .loader-bar {
+    box-shadow: 0 0 10px var(--primary);
+}
+
+/* Ensure the rest of the page is hidden during loading */
+body.loading {
+    overflow: hidden;
+}
+
+/* Enhanced Loader Styles */
+.loader-message {
+    font-size: 14px;
+    color: var(--text-color, #666);
+    margin-top: 8px;
+    opacity: 0.8;
+    max-width: 300px;
+    text-align: center;
+    font-weight: 400;
+}
+
+.security-icon {
+    position: absolute;
+    font-size: 24px;
+    color: var(--primary-color, #4a6cf7);
+    animation: float 3s infinite ease-in-out;
+    opacity: 0.7;
+}
+
+.security-icon:nth-child(1) {
+    top: 20%;
+    left: 25%;
+    animation-delay: 0s;
+}
+
+.security-icon:nth-child(2) {
+    top: 30%;
+    right: 25%;
+    animation-delay: 0.5s;
+}
+
+.security-icon:nth-child(3) {
+    bottom: 30%;
+    left: 30%;
+    animation-delay: 1s;
+}
+
+.security-icon:nth-child(4) {
+    bottom: 20%;
+    right: 30%;
+    animation-delay: 1.5s;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-15px) scale(1.1);
+    }
+    100% {
+        transform: translateY(0) scale(1);
+    }
+}
+
+.loader-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: var(--primary-color, #4a6cf7);
+}
+
+.loader-complete {
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--success-color, #10b981);
+    padding: 10px 20px;
+    border-radius: 20px;
+    background-color: rgba(16, 185, 129, 0.1);
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.loader-complete.show {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.loader-complete i {
+    margin-right: 8px;
+    animation: pulse-success 1.5s infinite;
+}
+
+@keyframes pulse-success {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Dark mode support for completion message */
+[data-theme="dark"] .loader-complete {
+    background-color: rgba(16, 185, 129, 0.2);
+}

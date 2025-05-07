@@ -4,19 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CipherVaultX | Secure Encryption</title>
+    <meta name="description" content="CipherVaultX - A secure encryption and steganography application for protecting your sensitive files and messages. Features file encryption, text encryption, and image steganography.">
+    <meta name="keywords" content="encryption, decryption, steganography, file security, text encryption, image steganography, AI-generated steganography">
+    <meta name="author" content="CipherVaultX Team">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    <link rel="canonical" href="{{ request.url_root }}">
+    <meta property="og:title" content="CipherVaultX | Secure Encryption">
+    <meta property="og:description" content="A secure encryption and steganography application for protecting your sensitive files and messages.">
+    <meta property="og:image" content="https://r2.fivemanage.com/3nWOCwH1JwmDjPjMMZ9V3/cipherofficiallogo.png">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="CipherVaultX">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="CipherVaultX | Secure Encryption">
+    <meta name="twitter:description" content="A secure encryption and steganography application for protecting your sensitive files and messages.">
+    <meta name="twitter:image" content="https://r2.fivemanage.com/3nWOCwH1JwmDjPjMMZ9V3/cipherofficiallogo.png">
+    <meta name="theme-color" content="#4a6cf7">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "CipherVaultX",
+      "description": "A secure encryption and steganography application for protecting your sensitive files and messages.",
+      "operatingSystem": "Any",
+      "applicationCategory": "SecurityApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock"
+      },
+      "featureList": [
+        "File Encryption & Decryption",
+        "Text Encryption & Decryption",
+        "Image Steganography",
+        "AI-Generated Image Steganography"
+      ],
+      "screenshot": "https://r2.fivemanage.com/3nWOCwH1JwmDjPjMMZ9V3/cipherofficiallogo.png",
+      "url": "{{ request.url }}"
+    }
+    </script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="loading">
+    <div class="loader-container" id="loader">
+        <i class="fas fa-shield-alt security-icon"></i>
+        <i class="fas fa-lock security-icon"></i>
+        <i class="fas fa-key security-icon"></i>
+        <i class="fas fa-user-secret security-icon"></i>
+        
+        <h1 class="loader-title">CipherVaultX</h1>
+        <img src="https://r2.fivemanage.com/3nWOCwH1JwmDjPjMMZ9V3/cipherofficiallogo.png" 
+             alt="CipherVaultX Logo" 
+             class="loader-logo"
+             id="loader-logo">
+        <div class="loader-progress">
+            <div class="loader-bar" id="loader-bar"></div>
+        </div>
+        <div class="loader-text">Initializing secure environment...</div>
+        <div class="loader-message" id="loader-message">Setting up encryption protocols</div>
+        <div class="loader-complete" id="loader-complete" style="display: none;">
+            <i class="fas fa-check-circle"></i> System Ready
+        </div>
+    </div>
+
     <nav class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand" href="/">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-shield-lock" viewBox="0 0 16 16">
-                    <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.775 11.775 0 0 1-2.517 2.453 7.159 7.159 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7.158 7.158 0 0 1-1.048-.625 11.777 11.777 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 62.456 62.456 0 0 1 5.072.56z"/>
-                    <path d="M9.5 6.5a1.5 1.5 0 0 1-1 1.415v2.585a.5.5 0 0 1-1 0V7.915a1.5 1.5 0 1 1 2-1.415z"/>
-                </svg>
+                <img src="{{ url_for('static', filename='images/cipherofficiallogo.png') }}" alt="CipherVaultX Logo" width="32" height="32" class="d-inline-block align-top me-2">
                 <span>CipherVaultX</span>
             </a>
             <div class="ms-auto">
@@ -585,7 +645,6 @@
     
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-            // File upload handling for each uploader
             const fileInputs = ['direct-file-upload', 'key-file-upload', 'direct-file-decrypt-upload', 'key-file-decrypt-upload', 'hide-image-upload', 'reveal-image-upload', 'edit-image-upload'];
             
             fileInputs.forEach(inputId => {
@@ -598,7 +657,6 @@
                         const file = fileInput.files[0];
                         const fileSize = (file.size / 1024).toFixed(2);
                         
-                        // Create a container for the file info and preview
                         let fileHtml = `
                             <div class="selected-file">
                                 <div class="selected-file-header">
@@ -612,7 +670,6 @@
                         
                         fileInfo.innerHTML = fileHtml;
                         
-                        // Generate preview based on file type
                         const previewContent = document.getElementById(`preview-${infoId}`);
                         generateFilePreview(file, previewContent);
                         
@@ -624,12 +681,9 @@
                 });
             });
             
-            // Function to generate preview based on file type
             function generateFilePreview(file, previewElement) {
-                // Clear previous preview
                 previewElement.innerHTML = '';
                 
-                // Check if file is an image
                 if (file.type.startsWith('image/')) {
                     const reader = new FileReader();
                     reader.onload = function(e) {
@@ -638,11 +692,9 @@
                     };
                     reader.readAsDataURL(file);
                 } 
-                // For non-image files, show an icon based on file type
                 else {
                     let fileIcon = 'fas fa-file'; // Default icon
                     
-                    // Determine icon based on file extension
                     const extension = file.name.split('.').pop().toLowerCase();
                     
                     if (['pdf'].includes(extension)) {
@@ -675,7 +727,6 @@
                 }
             }
             
-            // Generate key buttons
             document.getElementById('generate-file-key').addEventListener('click', function() {
                 fetch('/generate_key', { method: 'POST' })
                     .then(response => response.json())
@@ -696,7 +747,6 @@
                     });
             });
             
-            // Theme toggle
             const themeToggle = document.getElementById('theme-toggle');
             const htmlElement = document.documentElement;
             
@@ -726,7 +776,6 @@
                 themeToggle.classList.toggle('dark-mode-active', currentTheme === 'dark');
             }
             
-            // AI Image Generation for Steganography
             const useAiToggle = document.getElementById('use-ai-toggle');
             const useAiValue = document.getElementById('use-ai-value');
             const uploadImageSection = document.getElementById('upload-image-section');
@@ -753,8 +802,6 @@
                     aiImageSection.style.display = 'none';
                     hideImageUpload.required = true;
                     imagePrompt.required = false;
-                    
-                    // Reset preview
                     previewContainer.style.display = 'none';
                     previewImage.style.display = 'none';
                     previewError.style.display = 'none';
@@ -766,14 +813,10 @@
                 const prompt = imagePrompt.value.trim();
                 const message = document.getElementById('stegano-message').value.trim();
                 const aiProvider = document.querySelector('input[name="ai_provider"]:checked').value;
-                
-                // Show loading state
                 previewContainer.style.display = 'block';
                 previewLoading.style.display = 'block';
                 previewImage.style.display = 'none';
                 previewError.style.display = 'none';
-                
-                // Call API to generate image
                 const formData = new FormData();
                 formData.append('prompt', prompt);
                 formData.append('message', message);
@@ -786,22 +829,13 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Hide loading state
                         previewLoading.style.display = 'none';
-                        
-                        // Update preview image
                         previewImage.src = data.image;
                         previewImage.style.display = 'block';
-                        
-                        // Store the preview token
                         document.getElementById('preview-token').value = data.preview_token;
-                        
-                        // Show prompt if available
                         if (data.prompt && prompt === '') {
                             imagePrompt.value = data.prompt;
                         }
-                        
-                        // Show AI provider info if available
                         const providerName = data.provider === 'openai' ? 'DALL-E' : 'Hugging Face';
                         console.log(`Image generated with ${providerName}`);
                     } else {
@@ -816,16 +850,10 @@
                     previewError.style.display = 'block';
                 });
             });
-            
-            // Ensure form validation before submission
             document.getElementById('hide-message-form').addEventListener('submit', function(e) {
                 const useAi = useAiToggle.checked;
-                
-                // No validation needed for empty prompt since it's optional now
                 return true;
             });
-            
-            // Stats functionality
             function fetchAndUpdateStats() {
                 fetch('/stats-data', {
                     method: 'GET',
@@ -835,7 +863,6 @@
                 })
                 .then(response => response.json())
                 .then(stats => {
-                    // Update operation counts
                     document.getElementById('file-encrypt-count').textContent = stats.counts['file_encryption'] || 0;
                     document.getElementById('file-decrypt-count').textContent = stats.counts['file_decryption'] || 0;
                     document.getElementById('text-encrypt-count').textContent = stats.counts['text_encryption'] || 0;
@@ -848,13 +875,9 @@
                     console.error('Error fetching statistics:', error);
                 });
             }
-            
-            // Fetch stats when page loads
             document.addEventListener('DOMContentLoaded', function() {
                 fetchAndUpdateStats();
             });
-            
-            // Add drag and drop functionality to all drop areas
             document.querySelectorAll('.file-drop-area').forEach(dropArea => {
                 ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
                     dropArea.addEventListener(eventName, preventDefaults, false);
@@ -892,53 +915,132 @@
                     fileInput.dispatchEvent(event);
                 }
             });
-            
-            // Add special handling for edit-image-upload to extract message automatically
             document.getElementById('edit-image-upload').addEventListener('change', function(e) {
                 if (this.files.length > 0) {
                     // Show loading indicator
                     document.getElementById('message-loading').style.display = 'block';
                     document.getElementById('message-error').style.display = 'none';
                     document.getElementById('edit-stegano-message').value = '';
-                    
-                    // Create FormData and add the file
                     const formData = new FormData();
                     formData.append('image', this.files[0]);
-                    
-                    // Send the image to the server to extract the message
                     fetch('/extract_message', {
                         method: 'POST',
                         body: formData
                     })
                     .then(response => response.json())
                     .then(data => {
-                        // Hide loading indicator
                         document.getElementById('message-loading').style.display = 'none';
                         
                         if (data.success) {
-                            // Show the extracted message in the textarea
                             document.getElementById('edit-stegano-message').value = data.message;
                         } else {
-                            // Show error message
                             document.getElementById('message-error').style.display = 'block';
                         }
                     })
                     .catch(error => {
-                        // Hide loading indicator and show error
                         document.getElementById('message-loading').style.display = 'none';
                         document.getElementById('message-error').style.display = 'block';
                         console.error('Error:', error);
                     });
                 }
             });
-            
-            // Add event listener to reset edit message UI when switching to the tab
             document.getElementById('edit-message-tab').addEventListener('click', function() {
                 document.getElementById('edit-image-upload').value = '';
                 document.getElementById('edit-image-info').innerHTML = '';
                 document.getElementById('edit-stegano-message').value = '';
                 document.getElementById('message-loading').style.display = 'none';
                 document.getElementById('message-error').style.display = 'none';
+            });
+        </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const loader = document.getElementById('loader');
+                const loaderBar = document.getElementById('loader-bar');
+                const loaderMessage = document.getElementById('loader-message');
+                const loaderLogo = document.getElementById('loader-logo');
+                const loaderComplete = document.getElementById('loader-complete');
+                const body = document.body;
+                loaderLogo.addEventListener('error', function() {
+                    this.src = 'https://r2.fivemanage.com/3nWOCwH1JwmDjPjMMZ9V3/cipherofficiallogo.png';
+                });
+                const securityMessages = [
+                    "Initializing secure environment...",
+                    "Establishing secure connection...",
+                    "Verifying cryptographic integrity...",
+                    "Initializing steganography modules...",
+                    "Checking environment security...",
+                    "Loading encryption algorithms...",
+                    "Preparing secure vault...",
+                    "Configuring key management...",
+                    "Activating security features...",
+                    "Setting up encryption protocols...",
+                    "Validating security certificates...",
+                    "Initializing cipher algorithms...",
+                    "Preparing steganography engine...",
+                    "Establishing secure channels...",
+                    "Loading cryptographic libraries...",
+                    "Verifying secure environment...",
+                    "Configuring cipher modes...",
+                    "Initializing secure storage...",
+                    "Setting up key exchange protocols...",
+                    "Securing communication channels..."
+                ];
+                let messageIndex = 0;
+                const messageInterval = setInterval(() => {
+                    loaderMessage.textContent = securityMessages[messageIndex];
+                    messageIndex = (messageIndex + 1) % securityMessages.length;
+                }, 750);
+                setTimeout(() => {
+                    loaderBar.style.width = '20%';
+                    loaderBar.style.transition = 'width 2s ease-out';
+                    
+                    setTimeout(() => {
+                        loaderBar.style.width = '50%';
+                        loaderBar.style.transition = 'width 3s ease-in-out';
+                        
+                        setTimeout(() => {s
+                            loaderBar.style.width = '75%';
+                            loaderBar.style.transition = 'width 3s ease-in-out';
+                            
+                            setTimeout(() => {
+                                loaderBar.style.width = '100%';
+                                loaderBar.style.transition = 'width 2s ease-in';
+                                setTimeout(() => {
+                                    loaderComplete.style.display = 'block';
+                                    setTimeout(() => {
+                                        loaderComplete.classList.add('show');
+                                    }, 50);
+                                }, 1800);
+                            }, 3000);
+                        }, 3000);
+                    }, 2000);
+                }, 100);
+                function hasVisitedBefore() {
+                    return sessionStorage.getItem('hasVisitedCipherVaultX') === 'true';
+                }
+                
+                function markAsVisited() {
+                    sessionStorage.setItem('hasVisitedCipherVaultX', 'true');
+                }
+                
+                if (hasVisitedBefore()) {
+                    hideLoader(0);
+                } else {
+                    hideLoader(10000);
+                    markAsVisited();
+                }
+                
+                function hideLoader(delay) {
+                    setTimeout(() => {
+                        clearInterval(messageInterval);
+                        loaderComplete.classList.remove('show');
+                        loader.classList.add('fade-out');
+                        setTimeout(() => {
+                            loader.style.display = 'none';
+                            body.classList.remove('loading');
+                        }, 500);
+                    }, delay);
+                }
             });
         </script>
     </body>
