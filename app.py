@@ -15,11 +15,11 @@ import random
 import sqlite3
 from datetime import datetime
 from dotenv import load_dotenv
+import json
+import openai
 
-# Load environment variables from .env file
 load_dotenv()
 
-# Configuration settings from environment variables
 def get_config(key, default=None):
     return os.environ.get(key, default)
 
@@ -30,20 +30,11 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-# Dictionary to temporarily store encrypted files
 encrypted_files = {}
-
-# Dictionary to temporarily store decrypted files
 decrypted_files = {}
-
-# Dictionary to temporarily store AI preview images
 ai_preview_images = {}
-
-# Generate a secure token for temporary file access
 def generate_download_token():
     return secrets.token_urlsafe(16)
-
-# Store encrypted file temporarily with a token
 def store_encrypted_file(data, filename):
     token = generate_download_token()
     encrypted_files[token] = {
@@ -52,8 +43,6 @@ def store_encrypted_file(data, filename):
         'timestamp': time.time()
     }
     return token
-
-# Store decrypted file temporarily with a token
 def store_decrypted_file(data, filename):
     token = generate_download_token()
     decrypted_files[token] = {
@@ -62,13 +51,9 @@ def store_decrypted_file(data, filename):
         'timestamp': time.time()
     }
     return token
-
-# Cleanup function to remove old files from temp storage
 def cleanup_old_files():
     current_time = time.time()
     timeout = int(get_config('TEMP_STORAGE_TIMEOUT', 3600))
-    
-    # Clean up encrypted files
     tokens_to_remove = []
     for token, file_info in encrypted_files.items():
         if current_time - file_info['timestamp'] > timeout:
@@ -77,7 +62,6 @@ def cleanup_old_files():
     for token in tokens_to_remove:
         del encrypted_files[token]
         
-    # Clean up decrypted files
     tokens_to_remove = []
     for token, file_info in decrypted_files.items():
         if current_time - file_info['timestamp'] > timeout:
@@ -85,8 +69,6 @@ def cleanup_old_files():
     
     for token in tokens_to_remove:
         del decrypted_files[token]
-        
-    # Clean up AI preview images
     tokens_to_remove = []
     for token, image_info in ai_preview_images.items():
         if current_time - image_info['timestamp'] > timeout:
@@ -95,7 +77,6 @@ def cleanup_old_files():
     for token in tokens_to_remove:
         del ai_preview_images[token]
 
-# Initialize database
 def init_db():
     db_path = get_config('DB_PATH', 'cipher_stats.db')
     conn = sqlite3.connect(db_path)
@@ -113,10 +94,8 @@ def init_db():
     conn.commit()
     conn.close()
 
-# Initialize the database on startup
 init_db()
 
-# Function to log an operation
 def log_operation(operation_type, file_size=None, processing_time=None, file_type=None):
     db_path = get_config('DB_PATH', 'cipher_stats.db')
     conn = sqlite3.connect(db_path)
@@ -128,17 +107,13 @@ def log_operation(operation_type, file_size=None, processing_time=None, file_typ
     conn.commit()
     conn.close()
 
-# Function to get operation statistics
 def get_stats():
     db_path = get_config('DB_PATH', 'cipher_stats.db')
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    
-    # Get counts by operation type
     cursor.execute("SELECT operation_type, COUNT(*) FROM operation_stats GROUP BY operation_type")
     counts = {row[0]: row[1] for row in cursor.fetchall()}
     
-    # Get recent operations
     cursor.execute(
         "SELECT operation_type, timestamp, file_size, processing_time, file_type FROM operation_stats ORDER BY timestamp DESC LIMIT 10"
     )
@@ -170,7 +145,6 @@ def encrypt_file(file_data, key=None, use_key=True):
     return encrypted_data, key
 
 
-# Decrypt file
 def decrypt_file(encrypted_data, key=None):
     if key is None or b"||KEY_SEPARATOR||" in encrypted_data:
         parts = encrypted_data.split(b"||KEY_SEPARATOR||", 1)
@@ -194,7 +168,6 @@ def encrypt_text(text, key=None, use_key=True):
         return key + b"||KEY_SEPARATOR||" + encrypted_text, key
     return encrypted_text, key
 
-# Decrypt text
 def decrypt_text(encrypted_text, key=None):
     if key is None or b"||KEY_SEPARATOR||" in encrypted_text:
         parts = encrypted_text.split(b"||KEY_SEPARATOR||", 1)
@@ -202,11 +175,9 @@ def decrypt_text(encrypted_text, key=None):
             key = parts[0]
             encrypted_text = parts[1]
         else:
-            # If no separator found but key is None, this is an error
             if key is None:
                 raise Exception("No decryption key found. This may not be a direct encrypted text.")
     
-    # Ensure key is not None before creating the Fernet instance
     if key is None:
         raise Exception("Decryption key is required and was not provided.")
     
@@ -217,25 +188,14 @@ def decrypt_text(encrypted_text, key=None):
 def hide_message_in_image(image_data, message):
     """Hide a message in an image using LSB steganography"""
     try:
-        # Convert bytes to PIL Image
         image = Image.open(io.BytesIO(image_data))
-        
-        # Save the image temporarily
         temp_path = os.path.join(app.config['UPLOAD_FOLDER'], 'temp.png')
         image.save(temp_path)
-        
-        # Hide the message
         secret = lsb.hide(temp_path, message)
-        
-        # Save the result
         output_path = os.path.join(app.config['UPLOAD_FOLDER'], 'stegano_output.png')
         secret.save(output_path)
-        
-        # Read the result
         with open(output_path, 'rb') as f:
             result_data = f.read()
-        
-        # Clean up temporary files
         os.remove(temp_path)
         os.remove(output_path)
         
@@ -246,17 +206,10 @@ def hide_message_in_image(image_data, message):
 def reveal_message_from_image(image_data):
     """Extract hidden message from an image"""
     try:
-        # Convert bytes to PIL Image
         image = Image.open(io.BytesIO(image_data))
-        
-        # Save the image temporarily
         temp_path = os.path.join(app.config['UPLOAD_FOLDER'], 'temp.png')
         image.save(temp_path)
-        
-        # Extract the message
         message = lsb.reveal(temp_path)
-        
-        # Clean up temporary file
         os.remove(temp_path)
         
         return message
@@ -265,11 +218,8 @@ def reveal_message_from_image(image_data):
 
 def generate_prompt_from_message(message):
     """Generate an AI image prompt based on the hidden message content"""
-    # Check if message-based prompt generation is enabled
     if get_config('USE_MESSAGE_FOR_PROMPT', 'true').lower() != 'true':
         return get_default_prompt()
-    
-    # Get a random default prompt if message is not suitable
     def get_default_prompt():
         default_prompts = [
             "A futuristic landscape where nature and technology coexist in harmony — lush green forests intertwined with glowing, transparent structures, solar trees absorbing sunlight, floating gardens in the sky, and bioluminescent plants lighting the pathways.",
@@ -282,61 +232,41 @@ def generate_prompt_from_message(message):
             "A surreal dreamscape where objects defy gravity, doorways open to impossible places, and the sky shifts between day and night in patches, with crystalline structures reflecting prismatic light."
         ]
         return random.choice(default_prompts)
-    
-    # Clean and validate message
     if not message or len(message.strip()) < 5:
         return get_default_prompt()
-    
-    # Extract keywords (remove common words, punctuation)
     message = message.lower()
-    
-    # Remove common words and keep only meaningful keywords
     common_words = {'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'with', 'by', 
                    'about', 'as', 'of', 'is', 'was', 'were', 'be', 'been', 'being', 'am', 'are', 'have', 
                    'has', 'had', 'do', 'does', 'did', 'will', 'would', 'can', 'could', 'should', 'i', 
                    'you', 'he', 'she', 'it', 'we', 'they', 'my', 'your', 'his', 'her', 'its', 'our', 'their'}
-    
-    # Remove special characters and split by spaces
+
     words = re.sub(r'[^\w\s]', '', message).split()
     
-    # Filter out common words and short words
     keywords = [word for word in words if word not in common_words and len(word) > 3]
-    
-    # If no good keywords, use default
+
     if not keywords:
         return get_default_prompt()
-    
-    # Take up to MAX_KEYWORDS_FROM_MESSAGE random keywords to build the prompt
     max_keywords = int(get_config('MAX_KEYWORDS_FROM_MESSAGE', 5))
     if len(keywords) > max_keywords:
         keywords = random.sample(keywords, max_keywords)
-    
-    # Adjust style based on configuration
     prompt_style = get_config('DEFAULT_PROMPT_STYLE', 'artful').lower()
     
     if prompt_style == 'minimal':
-        # Simpler prompt style with minimal artistry
         prompt = "Image of "
         themes = [f"{keyword}" for keyword in keywords]
         prompt += ", ".join(themes)
         return prompt
         
     elif prompt_style == 'technical':
-        # More technical/literal style
         prompt = "Technical illustration featuring "
         themes = [f"concept of {keyword}" for keyword in keywords]
         prompt += ", ".join(themes)
         return prompt
     
-    else:  # artful (default)
-        # Generate mood and style variations for artistic prompts
+    else:
         moods = ['vibrant', 'mysterious', 'tranquil', 'dramatic', 'dreamy', 'surreal', 'fantastical', 'ethereal', 'dynamic', 'peaceful', 'chaotic', 'serene']
         styles = ['digital art', 'oil painting', 'watercolor', 'photorealistic', 'abstract', 'impressionist', 'cyberpunk', 'steampunk', 'fantasy', 'minimalist', 'concept art', 'ink drawing']
-        
-        # Create a prompt that doesn't directly reveal the message content
         prompt = f"A {random.choice(moods)} {random.choice(styles)} illustration featuring "
-        
-        # Add thematic elements based on keywords
         themes = []
         for keyword in keywords:
             theme_options = [
@@ -356,28 +286,34 @@ def generate_prompt_from_message(message):
         return prompt
 
 def generate_ai_image(prompt):
+    """Generate an image using either Hugging Face or OpenAI DALL-E"""
+    ai_provider = get_config('AI_PROVIDER', 'huggingface').lower()
+    
+    if ai_provider == 'openai':
+        return generate_dalle_image(prompt)
+    else:
+        return generate_huggingface_image(prompt)
+
+def generate_huggingface_image(prompt):
     """Generate an image using Hugging Face Stable Diffusion"""
     try:
-        model = get_config('IMAGE_MODEL', 'black-forest-labs/FLUX.1-dev')
-        api_key = get_config('API_KEY', '')
+        model = get_config('HF_IMAGE_MODEL', 'black-forest-labs/FLUX.1-dev')
+        api_key = get_config('HF_API_KEY', '')
         
         API_URL = f"https://api-inference.huggingface.co/models/{model}"
         headers = {"Authorization": f"Bearer {api_key}"}
-        
-        # Generate a random seed between 1 and 1,000,000
         random_seed = random.randint(1, 1000000)
         
         payload = {
             "inputs": prompt,
             "parameters": {
                 "seed": random_seed,
-                "guidance_scale": random.uniform(7.0, 8.5),  # Random guidance scale for style variation
-                "num_inference_steps": random.randint(30, 50)  # Random number of steps for detail variation
+                "guidance_scale": random.uniform(7.0, 8.5), 
+                "num_inference_steps": random.randint(30, 50)
             }
         }
-        
-        # Log the parameters for debugging
-        print(f"Image generation parameters: seed={random_seed}, prompt='{prompt}'")
+
+        print(f"HuggingFace image generation parameters: seed={random_seed}, prompt='{prompt}'")
         
         response = requests.post(API_URL, headers=headers, json=payload)
         
@@ -386,7 +322,41 @@ def generate_ai_image(prompt):
             
         return response.content
     except Exception as e:
-        raise Exception(f"Error generating image: {str(e)}")
+        raise Exception(f"Error generating image with HuggingFace: {str(e)}")
+
+def generate_dalle_image(prompt):
+    """Generate an image using OpenAI DALL-E"""
+    try:
+        api_key = get_config('OPENAI_API_KEY', '')
+        model = get_config('OPENAI_IMAGE_MODEL', 'dall-e-3')
+        size = get_config('OPENAI_IMAGE_SIZE', '1024x1024')
+        quality = get_config('OPENAI_IMAGE_QUALITY', 'standard')
+
+        openai.api_key = api_key
+
+        print(f"DALL-E image generation parameters: model={model}, size={size}, prompt='{prompt}'")
+
+        response = openai.Image.create(
+            model=model,
+            prompt=prompt,
+            size=size,
+            quality=quality,
+            n=1,
+            response_format="b64_json"
+        )
+
+        image_b64 = response["data"][0]["b64_json"]
+        image_data = base64.b64decode(image_b64)
+
+        if "revised_prompt" in response["data"][0]:
+            print(f"DALL-E revised prompt: {response['data'][0]['revised_prompt']}")
+        
+        return image_data
+    except Exception as e:
+        print(f"DALL-E Error Details: {str(e)}")
+
+        print("Falling back to Hugging Face for image generation due to OpenAI error")
+        return generate_huggingface_image(prompt)
 
 @app.route('/')
 def index():
@@ -413,7 +383,6 @@ def encrypt_file_route():
 
     try:
         if use_key:
-            # Ensure we have a key - if user didn't provide one, generate a new one
             key_input = request.form.get('key', '').strip()
             if key_input:
                 key = key_input.encode('utf-8')
@@ -423,22 +392,14 @@ def encrypt_file_route():
             encrypted_data, _ = encrypt_file(file_data, key, use_key=True)
         else:
             encrypted_data, key = encrypt_file(file_data, use_key=False)
-
-        # Store encrypted data temporarily and get token
         download_filename = f"encrypted_{filename}"
         token = store_encrypted_file(encrypted_data, download_filename)
 
         end_time = time.time()  # End timing
-        time_taken = (end_time - start_time) * 1000  # Convert to milliseconds
-        print(f"Encryption Time: {time_taken:.2f} ms")  # Print to console
-
-        # Log the operation
+        time_taken = (end_time - start_time) * 1000
+        print(f"Encryption Time: {time_taken:.2f} ms")
         log_operation('file_encryption', file_size=file_size, processing_time=time_taken, file_type=file_type)
-        
-        # Clean up old files
         cleanup_old_files()
-        
-        # Render the file result page
         return render_template('file_result.html', 
                               key=key.decode('utf-8'), 
                               filename=download_filename,
@@ -466,7 +427,7 @@ def decrypt_file_route():
     else:
         original_filename = filename
     
-    start_time = time.time()  # Start timing
+    start_time = time.time()
 
     try:
         if use_key:
@@ -478,20 +439,15 @@ def decrypt_file_route():
             decrypted_data = decrypt_file(file_data)
 
         end_time = time.time()  # End timing
-        time_taken = (end_time - start_time) * 1000  # Convert to milliseconds
-        print(f"Decryption Time: {time_taken:.2f} ms")  # Print to console
-
-        # Log the operation
+        time_taken = (end_time - start_time) * 1000
+        print(f"Decryption Time: {time_taken:.2f} ms")
         log_operation('file_decryption', file_size=file_size, processing_time=time_taken, file_type=file_type)
-        
-        # Store decrypted data temporarily and get token
+
         download_filename = f"decrypted_{original_filename}"
         token = store_decrypted_file(decrypted_data, download_filename)
         
-        # Clean up old files
         cleanup_old_files()
-        
-        # Render the file result page
+
         return render_template('file_decrypt_result.html', 
                               filename=download_filename,
                               token=token)
@@ -512,7 +468,6 @@ def encrypt_text_route():
 
     try:
         if use_key:
-            # Ensure we have a key - if user didn't provide one, generate a new one
             key_input = request.form.get('key', '').strip()
             if key_input:
                 key = key_input.encode('utf-8')
@@ -525,11 +480,10 @@ def encrypt_text_route():
             encrypted_text, _ = encrypt_text(text, key, use_key=False)
 
         encrypted_b64 = base64.b64encode(encrypted_text).decode('utf-8')
-        end_time = time.time()  # End timing
-        time_taken = (end_time - start_time) * 1000  # Convert to milliseconds
-        print(f"Text Encryption Time: {time_taken:.2f} ms")  # Print to console
-        
-        # Log the operation
+        end_time = time.time()
+        time_taken = (end_time - start_time) * 1000
+        print(f"Text Encryption Time: {time_taken:.2f} ms")
+
         log_operation('text_encryption', file_size=text_size, processing_time=time_taken, file_type='text')
 
         return render_template('result.html', encrypted_text=encrypted_b64, key=key.decode('utf-8'))
@@ -546,10 +500,9 @@ def decrypt_text_route():
 
     encrypted_b64 = request.form['text'].strip()
     text_size = len(encrypted_b64)
-    start_time = time.time()  # Start timing
+    start_time = time.time()
 
     try:
-        # First try to decode the base64 content
         try:
             encrypted_text = base64.b64decode(encrypted_b64)
         except Exception:
@@ -560,18 +513,14 @@ def decrypt_text_route():
             if not key:
                 return render_template('error.html', error="Decryption key is required.")
         else:
-            # For direct decryption, we don't need a separate key as it should be included in the encrypted data
-            # Check if the text contains our separator
             if b"||KEY_SEPARATOR||" not in encrypted_text:
                 return render_template('error.html', error="This doesn't appear to be a directly encrypted text. Try the 'Text + Key' option instead.")
-            key = None  # The decrypt_text function will extract the key if it's embedded
-
+            key = None
         decrypted_text = decrypt_text(encrypted_text, key)
-        end_time = time.time()  # End timing
-        time_taken = (end_time - start_time) * 1000  # Convert to milliseconds
-        print(f"Text Decryption Time: {time_taken:.2f} ms")  # Print to console
-        
-        # Log the operation
+        end_time = time.time()
+        time_taken = (end_time - start_time) * 1000
+        print(f"Text Decryption Time: {time_taken:.2f} ms")
+
         log_operation('text_decryption', file_size=text_size, processing_time=time_taken, file_type='text')
 
         return render_template('decrypt_result.html', decrypted_text=decrypted_text)
@@ -603,37 +552,24 @@ def hide_message():
     
     try:
         start_time = time.time()
-        
-        # Handle AI-generated image
         if use_ai:
-            # First check if we have a preview token
             preview_token = request.form.get('preview_token', '').strip()
             
             if preview_token and preview_token in ai_preview_images:
-                # Use the previously generated preview image if available
                 image_info = ai_preview_images[preview_token]
                 image_data = image_info['data']
-                # Remove from storage to free memory
                 del ai_preview_images[preview_token]
                 file_type = 'ai_image_png'
             else:
-                # No preview image available, generate a new one
                 user_prompt = request.form.get('prompt', '').strip()
                 
                 if user_prompt:
-                    # Use user's custom prompt if provided
                     prompt = user_prompt
                 else:
-                    # Generate a prompt based on the message content or default
                     prompt = generate_prompt_from_message(message)
-                    
-                # Log the generated prompt (for debugging)
                 print(f"Using prompt: {prompt}")
-                
-                # Generate the image
                 image_data = generate_ai_image(prompt)
                 file_type = 'ai_image_png'
-        # Handle uploaded image
         else:
             if 'image' not in request.files or request.files['image'].filename == '':
                 return render_template('error.html', error="No image file selected")
@@ -642,14 +578,10 @@ def hide_message():
             filename = secure_filename(image.filename)
             file_type = filename.split('.')[-1] if '.' in filename else 'unknown'
             image_data = image.read()
-        
-        # Hide message in the image
         stegano_image = hide_message_in_image(image_data, message)
         
         end_time = time.time()
         time_taken = (end_time - start_time) * 1000
-        
-        # Log the operation
         log_operation('steganography_hide', file_size=message_size, processing_time=time_taken, file_type=file_type)
         
         memory_file = io.BytesIO(stegano_image)
@@ -683,11 +615,65 @@ def reveal_message():
         
         end_time = time.time()
         time_taken = (end_time - start_time) * 1000
-        
-        # Log the operation
         log_operation('steganography_reveal', file_size=file_size, processing_time=time_taken, file_type=file_type)
         
         return render_template('decrypt_result.html', decrypted_text=message, type="steganography")
+    except Exception as e:
+        return render_template('error.html', error=str(e))
+
+@app.route('/extract_message', methods=['POST'])
+def extract_message():
+    """Extract a message from an image and return it as JSON (for AJAX requests)"""
+    if 'image' not in request.files or request.files['image'].filename == '':
+        return jsonify({'success': False, 'error': 'No image file selected'})
+    
+    image = request.files['image']
+    
+    try:
+        image_data = image.read()
+        message = reveal_message_from_image(image_data)
+        
+        return jsonify({
+            'success': True, 
+            'message': message
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/edit_message', methods=['POST'])
+def edit_message():
+    """Save an updated message to an image"""
+    if 'image' not in request.files or request.files['image'].filename == '':
+        return render_template('error.html', error="No image file selected")
+    
+    if 'message' not in request.form or not request.form['message'].strip():
+        return render_template('error.html', error="No message provided")
+    
+    image = request.files['image']
+    filename = secure_filename(image.filename)
+    file_type = filename.split('.')[-1] if '.' in filename else 'unknown'
+    
+    message = request.form['message'].strip()
+    message_size = len(message.encode('utf-8'))
+    
+    try:
+        start_time = time.time()
+        image_data = image.read()
+        stegano_image = hide_message_in_image(image_data, message)
+        
+        end_time = time.time()
+        time_taken = (end_time - start_time) * 1000
+        log_operation('steganography_edit', file_size=message_size, processing_time=time_taken, file_type='image_png')
+        
+        memory_file = io.BytesIO(stegano_image)
+        memory_file.seek(0)
+        
+        return send_file(
+            memory_file,
+            as_attachment=True,
+            download_name="edited_stegano_image.png",
+            mimetype='image/png'
+        )
     except Exception as e:
         return render_template('error.html', error=str(e))
 
@@ -695,13 +681,14 @@ def reveal_message():
 def generate_image_route():
     prompt = request.form.get('prompt', '').strip()
     message = request.form.get('message', '').strip()
-    
-    # If prompt is empty, generate from message or use default
+    ai_provider = request.form.get('ai_provider', '').strip()
+    if not ai_provider:
+        ai_provider = get_config('AI_PROVIDER', 'huggingface').lower()
+    os.environ['AI_PROVIDER'] = ai_provider
     if not prompt:
         if message and get_config('USE_MESSAGE_FOR_PROMPT', 'true').lower() == 'true':
             prompt = generate_prompt_from_message(message)
         else:
-            # Use a random default prompt
             def get_default_prompt():
                 default_prompts = [
                     "A futuristic landscape where nature and technology coexist in harmony",
@@ -720,23 +707,21 @@ def generate_image_route():
     try:
         image_data = generate_ai_image(prompt)
         image_b64 = base64.b64encode(image_data).decode('utf-8')
-        
-        # Store the generated image with a token
         preview_token = secrets.token_urlsafe(16)
         ai_preview_images[preview_token] = {
             'data': image_data,
             'prompt': prompt,
-            'timestamp': time.time()
+            'timestamp': time.time(),
+            'provider': ai_provider
         }
-        
-        # Determine whether to show the prompt to the user
         show_prompt = get_config('SHOW_PROMPT_TO_USER', 'true').lower() == 'true'
         
         return jsonify({
             'success': True, 
             'image': f"data:image/png;base64,{image_b64}",
             'prompt': prompt if show_prompt else None,
-            'preview_token': preview_token
+            'preview_token': preview_token,
+            'provider': ai_provider
         })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
@@ -745,15 +730,10 @@ def generate_image_route():
 def statistics():
     """Display statistics about the application usage"""
     stats = get_stats()
-    
-    # Format timestamps for display
     if 'recent' in stats:
         formatted_recent = []
         for op in stats['recent']:
-            # Format: operation_type, timestamp, file_size, processing_time, file_type
             op_type = op[0]
-            
-            # Parse timestamp string to datetime object
             if isinstance(op[1], str):
                 try:
                     timestamp = datetime.strptime(op[1], '%Y-%m-%d %H:%M:%S.%f')
@@ -763,8 +743,6 @@ def statistics():
                 timestamp = op[1]
                 
             formatted_time = timestamp.strftime('%Y-%m-%d %H:%M:%S')
-            
-            # Format file size
             file_size = op[2]
             if file_size:
                 if file_size > 1048576:  # 1 MB
@@ -773,11 +751,9 @@ def statistics():
                     formatted_size = f"{file_size/1024:.2f} KB"
             else:
                 formatted_size = "N/A"
-                
-            # Format processing time
             proc_time = op[3]
             if proc_time:
-                if proc_time > 1000:  # 1 second
+                if proc_time > 1000:
                     formatted_proc_time = f"{proc_time/1000:.2f} s"
                 else:
                     formatted_proc_time = f"{proc_time:.2f} ms"
@@ -800,19 +776,14 @@ def stats_data():
 
 @app.route('/download-encrypted-file/<token>')
 def download_encrypted_file(token):
-    # Verify token and get file info
     if token not in encrypted_files:
         return render_template('error.html', error="File not found or has expired. Please encrypt your file again.")
     
     file_info = encrypted_files[token]
     encrypted_data = file_info['data']
     filename = file_info['filename']
-    
-    # Create a BytesIO object for the file
     memory_file = io.BytesIO(encrypted_data)
     memory_file.seek(0)
-    
-    # Send the file to the user
     return send_file(
         memory_file,
         as_attachment=True,
@@ -822,19 +793,14 @@ def download_encrypted_file(token):
 
 @app.route('/download-decrypted-file/<token>')
 def download_decrypted_file(token):
-    # Verify token and get file info
     if token not in decrypted_files:
         return render_template('error.html', error="File not found or has expired. Please decrypt your file again.")
     
     file_info = decrypted_files[token]
     decrypted_data = file_info['data']
     filename = file_info['filename']
-    
-    # Create a BytesIO object for the file
     memory_file = io.BytesIO(decrypted_data)
     memory_file.seek(0)
-    
-    # Send the file to the user
     return send_file(
         memory_file,
         as_attachment=True,
@@ -843,4 +809,9 @@ def download_decrypted_file(token):
     )
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=10000)
+    try:
+        app.run(debug=True, host='0.0.0.0', port=10000)
+    except Exception as e:
+        print(f"ERROR: Failed to start application: {str(e)}")
+        import traceback
+        traceback.print_exc()

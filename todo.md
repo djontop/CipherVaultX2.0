@@ -1,2 +1,0 @@
--- instant of direct download encypted file it will option result page to download file /
--- check direct without key decryption

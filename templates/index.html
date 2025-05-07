@@ -320,6 +320,12 @@
                                             <i class="fas fa-eye me-2"></i>Reveal Message
                                         </button>
                                     </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="edit-message-tab" data-bs-toggle="pill" 
+                                                data-bs-target="#edit-message-content" type="button" role="tab">
+                                            <i class="fas fa-edit me-2"></i>Edit Message
+                                        </button>
+                                    </li>
                                 </ul>
                                 
                                 <div class="tab-content" id="steganoTabsContent">
@@ -366,6 +372,27 @@
                                                 </div>
                                                 
                                                 <div class="form-group mb-3">
+                                                    <label class="form-label">AI Provider</label>
+                                                    <div class="d-flex">
+                                                        <div class="form-check me-3">
+                                                            <input class="form-check-input" type="radio" name="ai_provider" id="provider-huggingface" value="huggingface" checked>
+                                                            <label class="form-check-label" for="provider-huggingface">
+                                                                Hugging Face
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="ai_provider" id="provider-openai" value="openai">
+                                                            <label class="form-check-label" for="provider-openai">
+                                                                DALL-E (OpenAI)
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-text text-muted mt-1">
+                                                        DALL-E generally produces higher quality images but requires an OpenAI API key.
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="form-group mb-3">
                                                     <label for="image-prompt" class="form-label">Custom Image Description (Optional)</label>
                                                     <div class="input-group">
                                                         <input type="text" name="prompt" id="image-prompt" class="form-control" placeholder="Provide a custom prompt or leave blank to generate one based on your message">
@@ -377,6 +404,7 @@
                                                         If left blank, an image will be intelligently created based on keywords from your hidden message.
                                                     </div>
                                                 </div>
+                                                
                                                 <!-- Hidden input for preview token -->
                                                 <input type="hidden" id="preview-token" name="preview_token" value="">
                                             </div>
@@ -424,6 +452,65 @@
                                             <div class="d-grid">
                                                 <button type="submit" class="btn btn-primary btn-lg">
                                                     <i class="fas fa-eye me-2"></i>Reveal Hidden Message
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    
+                                    <!-- Edit Hidden Message -->
+                                    <div class="tab-pane fade" id="edit-message-content" role="tabpanel">
+                                        <form action="{{ url_for('edit_message') }}" method="post" enctype="multipart/form-data" id="edit-message-form">
+                                            <div class="alert alert-info mb-4">
+                                                <div class="d-flex">
+                                                    <div class="alert-icon me-3">
+                                                        <i class="fas fa-info-circle"></i>
+                                                    </div>
+                                                    <div>
+                                                        Upload an image with a hidden message, edit the message, and create a new image with your updated message.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="file-upload-container mb-4">
+                                                <input type="file" name="image" id="edit-image-upload" class="file-input" accept="image/*" required>
+                                                <label for="edit-image-upload" class="file-drop-area">
+                                                    <div class="file-icon">
+                                                        <i class="fas fa-cloud-upload-alt"></i>
+                                                    </div>
+                                                    <div class="file-message">
+                                                        <span class="main-text">Drag & drop steganography image</span>
+                                                        <span class="sub-text">Upload image with hidden message to edit</span>
+                                                    </div>
+                                                </label>
+                                                <div id="edit-image-info" class="file-info"></div>
+                                            </div>
+                                            
+                                            <div id="message-loading" style="display:none;" class="text-center mb-3">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                                <p class="mt-2">Extracting hidden message...</p>
+                                            </div>
+                                            
+                                            <div id="message-error" style="display:none;" class="alert alert-warning mb-4">
+                                                <div class="d-flex">
+                                                    <div class="alert-icon me-3">
+                                                        <i class="fas fa-exclamation-triangle"></i>
+                                                    </div>
+                                                    <div>
+                                                        No hidden message found in this image or the message is corrupted.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="form-group mb-4">
+                                                <label for="edit-stegano-message" class="form-label">Edit Message</label>
+                                                <textarea name="message" id="edit-stegano-message" class="form-control" rows="4" placeholder="The hidden message will appear here when you upload an image..." required></textarea>
+                                            </div>
+                                            
+                                            <div class="d-grid">
+                                                <button type="submit" class="btn btn-primary btn-lg">
+                                                    <i class="fas fa-save me-2"></i>Save Updated Image
                                                 </button>
                                             </div>
                                         </form>
@@ -478,6 +565,12 @@
                                     <span class="stat-label">Messages Revealed</span>
                                 </div>
                             </div>
+                            <div class="col">
+                                <div class="stat-box">
+                                    <span class="stat-count" id="stegano-edit-count">0</span>
+                                    <span class="stat-label">Messages Edited</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -493,7 +586,7 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
             // File upload handling for each uploader
-            const fileInputs = ['direct-file-upload', 'key-file-upload', 'direct-file-decrypt-upload', 'key-file-decrypt-upload', 'hide-image-upload', 'reveal-image-upload'];
+            const fileInputs = ['direct-file-upload', 'key-file-upload', 'direct-file-decrypt-upload', 'key-file-decrypt-upload', 'hide-image-upload', 'reveal-image-upload', 'edit-image-upload'];
             
             fileInputs.forEach(inputId => {
                 document.getElementById(inputId).addEventListener('change', function(e) {
@@ -504,13 +597,24 @@
                     if (fileInput.files.length > 0) {
                         const file = fileInput.files[0];
                         const fileSize = (file.size / 1024).toFixed(2);
-                        fileInfo.innerHTML = `
+                        
+                        // Create a container for the file info and preview
+                        let fileHtml = `
                             <div class="selected-file">
-                                <i class="fas fa-file me-2"></i>
-                                <span class="file-name">${file.name}</span>
-                                <span class="file-size">(${fileSize} KB)</span>
+                                <div class="selected-file-header">
+                                    <i class="fas fa-file me-2"></i>
+                                    <span class="file-name">${file.name}</span>
+                                    <span class="file-size">(${fileSize} KB)</span>
+                                </div>
+                                <div class="preview-content" id="preview-${infoId}"></div>
                             </div>
                         `;
+                        
+                        fileInfo.innerHTML = fileHtml;
+                        
+                        // Generate preview based on file type
+                        const previewContent = document.getElementById(`preview-${infoId}`);
+                        generateFilePreview(file, previewContent);
                         
                         fileInput.closest('.file-upload-container').querySelector('.file-drop-area').classList.add('has-file');
                     } else {
@@ -520,44 +624,56 @@
                 });
             });
             
-            // Add drag and drop functionality to all drop areas
-            document.querySelectorAll('.file-drop-area').forEach(dropArea => {
-                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                    dropArea.addEventListener(eventName, preventDefaults, false);
-                });
+            // Function to generate preview based on file type
+            function generateFilePreview(file, previewElement) {
+                // Clear previous preview
+                previewElement.innerHTML = '';
                 
-                function preventDefaults(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
+                // Check if file is an image
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewElement.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                        previewElement.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                } 
+                // For non-image files, show an icon based on file type
+                else {
+                    let fileIcon = 'fas fa-file'; // Default icon
+                    
+                    // Determine icon based on file extension
+                    const extension = file.name.split('.').pop().toLowerCase();
+                    
+                    if (['pdf'].includes(extension)) {
+                        fileIcon = 'fas fa-file-pdf';
+                    } else if (['doc', 'docx'].includes(extension)) {
+                        fileIcon = 'fas fa-file-word';
+                    } else if (['xls', 'xlsx'].includes(extension)) {
+                        fileIcon = 'fas fa-file-excel';
+                    } else if (['ppt', 'pptx'].includes(extension)) {
+                        fileIcon = 'fas fa-file-powerpoint';
+                    } else if (['zip', 'rar', '7z'].includes(extension)) {
+                        fileIcon = 'fas fa-file-archive';
+                    } else if (['txt', 'md'].includes(extension)) {
+                        fileIcon = 'fas fa-file-alt';
+                    } else if (['mp3', 'wav', 'ogg'].includes(extension)) {
+                        fileIcon = 'fas fa-file-audio';
+                    } else if (['mp4', 'avi', 'mov'].includes(extension)) {
+                        fileIcon = 'fas fa-file-video';
+                    } else if (['html', 'css', 'js', 'php', 'py', 'java'].includes(extension)) {
+                        fileIcon = 'fas fa-file-code';
+                    }
+                    
+                    previewElement.innerHTML = `
+                        <div class="document-preview">
+                            <i class="${fileIcon}"></i>
+                            <span>${file.name}</span>
+                        </div>
+                    `;
+                    previewElement.style.display = 'block';
                 }
-                
-                ['dragenter', 'dragover'].forEach(eventName => {
-                    dropArea.addEventListener(eventName, highlight, false);
-                });
-                
-                ['dragleave', 'drop'].forEach(eventName => {
-                    dropArea.addEventListener(eventName, unhighlight, false);
-                });
-                
-                function highlight() {
-                    dropArea.classList.add('highlight');
-                }
-                
-                function unhighlight() {
-                    dropArea.classList.remove('highlight');
-                }
-                
-                dropArea.addEventListener('drop', handleDrop, false);
-                
-                function handleDrop(e) {
-                    const dt = e.dataTransfer;
-                    const files = dt.files;
-                    const fileInput = dropArea.parentElement.querySelector('.file-input');
-                    fileInput.files = files;
-                    const event = new Event('change');
-                    fileInput.dispatchEvent(event);
-                }
-            });
+            }
             
             // Generate key buttons
             document.getElementById('generate-file-key').addEventListener('click', function() {
@@ -649,6 +765,7 @@
             generatePreviewBtn.addEventListener('click', function() {
                 const prompt = imagePrompt.value.trim();
                 const message = document.getElementById('stegano-message').value.trim();
+                const aiProvider = document.querySelector('input[name="ai_provider"]:checked').value;
                 
                 // Show loading state
                 previewContainer.style.display = 'block';
@@ -660,6 +777,7 @@
                 const formData = new FormData();
                 formData.append('prompt', prompt);
                 formData.append('message', message);
+                formData.append('ai_provider', aiProvider);
                 
                 fetch('/generate_image', {
                     method: 'POST',
@@ -682,6 +800,10 @@
                         if (data.prompt && prompt === '') {
                             imagePrompt.value = data.prompt;
                         }
+                        
+                        // Show AI provider info if available
+                        const providerName = data.provider === 'openai' ? 'DALL-E' : 'Hugging Face';
+                        console.log(`Image generated with ${providerName}`);
                     } else {
                         previewLoading.style.display = 'none';
                         previewError.textContent = data.error || 'Unknown error generating image';
@@ -720,6 +842,7 @@
                     document.getElementById('text-decrypt-count').textContent = stats.counts['text_decryption'] || 0;
                     document.getElementById('stegano-hide-count').textContent = stats.counts['steganography_hide'] || 0;
                     document.getElementById('stegano-reveal-count').textContent = stats.counts['steganography_reveal'] || 0;
+                    document.getElementById('stegano-edit-count').textContent = stats.counts['steganography_edit'] || 0;
                 })
                 .catch(error => {
                     console.error('Error fetching statistics:', error);
@@ -729,6 +852,93 @@
             // Fetch stats when page loads
             document.addEventListener('DOMContentLoaded', function() {
                 fetchAndUpdateStats();
+            });
+            
+            // Add drag and drop functionality to all drop areas
+            document.querySelectorAll('.file-drop-area').forEach(dropArea => {
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    dropArea.addEventListener(eventName, preventDefaults, false);
+                });
+                
+                function preventDefaults(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    dropArea.addEventListener(eventName, highlight, false);
+                });
+                
+                ['dragleave', 'drop'].forEach(eventName => {
+                    dropArea.addEventListener(eventName, unhighlight, false);
+                });
+                
+                function highlight() {
+                    dropArea.classList.add('highlight');
+                }
+                
+                function unhighlight() {
+                    dropArea.classList.remove('highlight');
+                }
+                
+                dropArea.addEventListener('drop', handleDrop, false);
+                
+                function handleDrop(e) {
+                    const dt = e.dataTransfer;
+                    const files = dt.files;
+                    const fileInput = dropArea.parentElement.querySelector('.file-input');
+                    fileInput.files = files;
+                    const event = new Event('change');
+                    fileInput.dispatchEvent(event);
+                }
+            });
+            
+            // Add special handling for edit-image-upload to extract message automatically
+            document.getElementById('edit-image-upload').addEventListener('change', function(e) {
+                if (this.files.length > 0) {
+                    // Show loading indicator
+                    document.getElementById('message-loading').style.display = 'block';
+                    document.getElementById('message-error').style.display = 'none';
+                    document.getElementById('edit-stegano-message').value = '';
+                    
+                    // Create FormData and add the file
+                    const formData = new FormData();
+                    formData.append('image', this.files[0]);
+                    
+                    // Send the image to the server to extract the message
+                    fetch('/extract_message', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Hide loading indicator
+                        document.getElementById('message-loading').style.display = 'none';
+                        
+                        if (data.success) {
+                            // Show the extracted message in the textarea
+                            document.getElementById('edit-stegano-message').value = data.message;
+                        } else {
+                            // Show error message
+                            document.getElementById('message-error').style.display = 'block';
+                        }
+                    })
+                    .catch(error => {
+                        // Hide loading indicator and show error
+                        document.getElementById('message-loading').style.display = 'none';
+                        document.getElementById('message-error').style.display = 'block';
+                        console.error('Error:', error);
+                    });
+                }
+            });
+            
+            // Add event listener to reset edit message UI when switching to the tab
+            document.getElementById('edit-message-tab').addEventListener('click', function() {
+                document.getElementById('edit-image-upload').value = '';
+                document.getElementById('edit-image-info').innerHTML = '';
+                document.getElementById('edit-stegano-message').value = '';
+                document.getElementById('message-loading').style.display = 'none';
+                document.getElementById('message-error').style.display = 'none';
             });
         </script>
     </body>

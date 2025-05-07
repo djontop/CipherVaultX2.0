@@ -264,24 +264,168 @@ body {
 
 .selected-file {
     display: flex;
+    flex-direction: column;
+    background: var(--bg-light);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    position: relative;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.dark-mode .selected-file {
+    background: var(--bg-dark-secondary);
+    border-color: var(--border-color-dark);
+}
+
+.file-info {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    padding: 0.75rem;
-    background-color: var(--drop-area-bg);
-    border-radius: 0.5rem;
-    transition: background-color 0.3s ease;
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.file-details {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    max-width: 80%;
+}
+
+.file-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: var(--primary-light);
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.dark-mode .file-icon {
+    background: var(--primary-dark);
+}
+
+.file-icon i {
+    color: var(--primary-color);
+    font-size: 1.25rem;
+}
+
+.file-name-size {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .file-name {
     font-weight: 500;
-    margin-right: 0.5rem;
-    color: var(--text-color);
-    transition: color 0.3s ease;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .file-size {
+    font-size: 0.75rem;
     color: var(--text-muted);
-    font-size: 0.875rem;
-    transition: color 0.3s ease;
+}
+
+.file-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.file-actions button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+
+.file-actions button:hover {
+    background: var(--bg-hover);
+}
+
+.dark-mode .file-actions button:hover {
+    background: var(--bg-dark-hover);
+}
+
+.file-actions button i {
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+.file-actions button:hover i {
+    color: var(--text-primary);
+}
+
+/* Preview content container */
+.preview-content {
+    width: 100%;
+    margin-top: 0.75rem;
+    border-top: 1px solid var(--border-color);
+    padding-top: 0.75rem;
+}
+
+.dark-mode .preview-content {
+    border-color: var(--border-color-dark);
+}
+
+.preview-content img {
+    max-width: 100%;
+    max-height: 250px;
+    border-radius: 6px;
+    object-fit: contain;
+}
+
+/* Document preview styles */
+.document-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    text-align: center;
+    margin: 0.5rem 0;
+}
+
+.dark-mode .document-preview {
+    background-color: var(--bg-dark-secondary);
+}
+
+.document-preview i {
+    font-size: 1.75rem;
+    margin-right: 0.75rem;
+    color: var(--text-muted);
+}
+
+.document-preview span {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Dark mode styling for file preview in selected-file */
+[data-theme="dark"] .document-preview {
+    background-color: #2a2a2a;
+    border-color: #444;
+}
+
+[data-theme="dark"] .document-preview i {
+    color: #adb5bd;
 }
 
 /* Form elements */
@@ -1039,4 +1183,98 @@ textarea.form-control {
     .stat-label {
         font-size: 8px;
     }
+}
+
+/* File Preview Styling */
+.file-preview {
+    max-width: 100%;
+    margin-top: 0.5rem;
+    text-align: center;
+    display: none;
+}
+
+.file-preview img {
+    max-width: 100%;
+    max-height: 150px;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    object-fit: contain;
+}
+
+.file-preview .document-preview {
+    padding: 1rem;
+    border: 1px solid #e9e9e9;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    color: #495057;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.file-preview .document-preview i {
+    font-size: 2rem;
+    margin-right: 0.5rem;
+    color: #6c757d;
+}
+
+/* Dark mode styling for file preview */
+[data-theme="dark"] .file-preview img {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .file-preview .document-preview {
+    background-color: #2a2a2a;
+    border-color: #444;
+    color: #e9e9e9;
+}
+
+[data-theme="dark"] .file-preview .document-preview i {
+    color: #adb5bd;
+}
+
+.file-name {
+    font-weight: 500;
+    margin-right: 0.5rem;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+}
+
+.file-size {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    transition: color 0.3s ease;
+}
+
+.document-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background-color: var(--bg-light);
+    border-radius: 8px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.document-preview i {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--primary-color);
+}
+
+.document-preview span {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dark-mode .document-preview {
+    background-color: var(--bg-dark-secondary);
 }

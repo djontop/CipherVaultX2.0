@@ -5,3 +5,4 @@ stegano
 Pillow
 requests
 python-dotenv
+openai
